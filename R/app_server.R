@@ -19,6 +19,116 @@ app_server <- function(input, output, session) {
 
   refresh_data()
 
+  # Statistics outputs for home tab
+  output$stat_total_recipes <- renderText({
+    length(rv$recipes)
+  })
+
+  output$stat_cuisines <- renderText({
+    if (length(rv$recipes) == 0) return("0")
+    length(unique(sapply(rv$recipes, function(r) r$source)))
+  })
+
+  output$stat_ingredients <- renderText({
+    length(rv$ingredients)
+  })
+
+  output$stat_avg_ingredients <- renderText({
+    if (length(rv$recipes) == 0) return("0")
+    round(mean(sapply(rv$recipes, function(r) length(r$ingredients))), 1)
+  })
+
+  # Matching: simple name-based matching
+  calc_match <- function(recipe, inventory) {
+    if (is.null(recipe$ingredients) || length(recipe$ingredients) == 0) return(0)
+    inv_names <- tolower(sapply(inventory, function(x) if (!is.null(x$ingredient_name)) x$ingredient_name else ""))
+    req_names <- tolower(sapply(recipe$ingredients, function(i) if (!is.null(i$ingredient_name)) i$ingredient_name else ""))
+    matched <- sum(sapply(req_names, function(r) any(grepl(r, inv_names, fixed = TRUE))))
+    round(100 * matched / length(req_names))
+  }
+
+  # Render modern recipe cards with filtering
+  output$recipes_cards_modern <- renderUI({
+    recs <- rv$recipes
+    inv <- rv$ingredients
+
+    # Apply filters
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+
+    if (!is.null(input$cuisine_filter) && input$cuisine_filter != "") {
+      recs <- Filter(function(r) r$source == input$cuisine_filter, recs)
+    }
+
+    threshold <- input$match_threshold %||% 0
+    recs <- Filter(function(r) calc_match(r, inv) >= threshold, recs)
+
+    if (length(recs) == 0) {
+      return(tags$div(
+        class = "alert alert-info",
+        tags$i(class = "fas fa-search"), " No recipes match your criteria"
+      ))
+    }
+
+    cards <- lapply(recs, function(r) {
+      pct <- calc_match(r, inv)
+      match_class <- if (pct >= 75) "match-high" else if (pct >= 50) "match-medium" else "match-low"
+
+      tags$div(
+        class = "recipe-card",
+        div(
+          class = "recipe-card-title",
+          tags$i(class = "fas fa-bowl-food", style = "color: var(--primary); margin-right: 0.5rem;"),
+          r$title
+        ),
+        div(
+          class = "recipe-card-meta",
+          tags$span(
+            class = "recipe-meta-item",
+            tags$i(class = "fas fa-globe"),
+            r$source
+          ),
+          tags$span(
+            class = "recipe-meta-item",
+            tags$i(class = "fas fa-carrot"),
+            sprintf("%d ingredients", length(r$ingredients))
+          ),
+          tags$span(
+            class = "recipe-meta-item",
+            tags$i(class = "fas fa-list-check"),
+            sprintf("%d steps", length(r$instructions))
+          )
+        ),
+        div(
+          class = "mb-3",
+          tags$span(class = paste("match-badge", match_class), sprintf("Match: %d%%", pct))
+        ),
+        div(
+          class = "btn-group btn-group-sm",
+          actionButton(
+            paste0("view_", r$recipe_id),
+            tags$i(class = "fas fa-eye"), " View",
+            class = "btn btn-primary btn-sm"
+          ),
+          actionButton(
+            paste0("edit_", r$recipe_id),
+            tags$i(class = "fas fa-edit"), " Edit",
+            class = "btn btn-info btn-sm"
+          ),
+          actionButton(
+            paste0("del_", r$recipe_id),
+            tags$i(class = "fas fa-trash"), " Delete",
+            class = "btn btn-danger btn-sm"
+          )
+        )
+      )
+    })
+
+    do.call(tagList, cards)
+  })
+
   # Simple ingredient parser: one-per-line -> ingredient_name = line trimmed
   parse_ingredients_raw <- function(text) {
     lines <- unlist(strsplit(as.character(text), "[\\r\\n]+"))
@@ -57,6 +167,15 @@ app_server <- function(input, output, session) {
     refresh_data()
   })
 
+  # Clear recipe form
+  observeEvent(input$clear_recipe, {
+    updateTextInput(session, "new_title", value = "")
+    updateTextInput(session, "new_source", value = "")
+    updateTextInput(session, "new_source_url", value = "")
+    updateTextAreaInput(session, "new_ingredients_raw", value = "")
+    updateTextAreaInput(session, "new_instructions", value = "")
+  })
+
   output$new_recipe_preview <- renderPrint({
     list(title = input$new_title, ingredients = parse_ingredients_raw(input$new_ingredients_raw))
   })
@@ -75,44 +194,6 @@ app_server <- function(input, output, session) {
     updateNumericInput(session, "ing_qty", value = NA)
     updateTextInput(session, "ing_unit", value = "")
     refresh_data()
-  })
-
-  # Matching: simple name-based matching
-  calc_match <- function(recipe, inventory) {
-    if (is.null(recipe$ingredients) || length(recipe$ingredients) == 0) return(0)
-    inv_names <- tolower(sapply(inventory, function(x) if (!is.null(x$ingredient_name)) x$ingredient_name else ""))
-    req_names <- tolower(sapply(recipe$ingredients, function(i) if (!is.null(i$ingredient_name)) i$ingredient_name else ""))
-    matched <- sum(sapply(req_names, function(r) any(grepl(r, inv_names, fixed = TRUE))))
-    round(100 * matched / length(req_names))
-  }
-
-  # Render recipes table
-  output$recipes_table <- DT::renderDataTable({
-    recs <- rv$recipes
-    if (length(recs) == 0) return(DT::datatable(data.frame()))
-    df <- do.call(rbind, lapply(recs, function(r) {
-      data.frame(recipe_id = r$recipe_id, title = r$title, stringsAsFactors = FALSE)
-    }))
-    DT::datatable(df, selection = 'single', rownames = FALSE)
-  })
-
-  # Render recipe cards with view button
-  output$recipes_cards <- renderUI({
-    recs <- rv$recipes
-    inv <- rv$ingredients
-    if (length(recs) == 0) return(tags$p("No recipes yet"))
-    cards <- lapply(recs, function(r) {
-      pct <- calc_match(r, inv)
-      if (is.null(pct)) pct <- 0
-      tags$div(class = "recipe-card well",
-           h4(r$title),
-           tags$p(sprintf("Match: %s%%", pct)),
-           actionButton(inputId = paste0("view_", r$recipe_id), label = "View", class = "btn-sm btn-primary"),
-           actionButton(inputId = paste0("edit_", r$recipe_id), label = "Edit", class = "btn-sm btn-info"),
-           actionButton(inputId = paste0("del_", r$recipe_id), label = "Delete", class = "btn-sm btn-danger")
-      )
-    })
-    do.call(tagList, cards)
   })
 
   # Dynamic observers for view buttons: show modal with details
