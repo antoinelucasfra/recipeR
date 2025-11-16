@@ -36,6 +36,93 @@ save_shopping_list <- function(items) {
   invisible(TRUE)
 }
 
+## Import/Export/Backup utilities
+export_recipes_json <- function(path) {
+  recs <- get_recipes()
+  out <- list(version = "1.0", export_date = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ"), recipe_count = length(recs), recipes = unname(recs))
+  jsonlite::write_json(out, path, auto_unbox = TRUE, pretty = TRUE)
+  invisible(TRUE)
+}
+
+export_recipes_csv <- function(path) {
+  recs <- get_recipes()
+  # Flatten to simple rows: recipe_id, title, ingredient_raw, instruction_text
+  rows <- do.call(rbind, lapply(recs, function(r) {
+    ing_lines <- sapply(r$ingredients, function(i) i$raw_text)
+    inst_lines <- sapply(r$instructions, function(s) s$instruction_text)
+    data.frame(recipe_id = r$recipe_id, title = r$title, ingredients = paste(ing_lines, collapse = " | "), instructions = paste(inst_lines, collapse = " | "), stringsAsFactors = FALSE)
+  }))
+  utils::write.csv(rows, path, row.names = FALSE)
+  invisible(TRUE)
+}
+
+import_recipes_json <- function(path, overwrite = FALSE) {
+  obj <- jsonlite::read_json(path, simplifyVector = TRUE)
+  if (is.null(obj$recipes)) stop("Invalid import format: 'recipes' missing")
+  for (r in obj$recipes) {
+    # use title+source_url as dedupe key
+    db <- load_db()
+    dup <- NULL
+    if (!is.null(r$recipe_id) && !is.null(db$recipes[[r$recipe_id]])) dup <- r$recipe_id
+    if (!is.null(dup) && !overwrite) next
+    add_recipe(r)
+  }
+  invisible(TRUE)
+}
+
+import_recipes_csv <- function(path) {
+  df <- utils::read.csv(path, stringsAsFactors = FALSE)
+  for (i in seq_len(nrow(df))) {
+    row <- df[i,]
+    ing_lines <- if (!is.null(row$ingredients)) strsplit(row$ingredients, " | ", fixed = TRUE)[[1]] else character()
+    inst_lines <- if (!is.null(row$instructions)) strsplit(row$instructions, " | ", fixed = TRUE)[[1]] else character()
+    recipe <- list(title = row$title, source = "imported", source_url = NA, ingredients = lapply(ing_lines, function(x) list(raw_text = x, ingredient_name = x)), instructions = lapply(seq_along(inst_lines), function(j) list(step_number = j, instruction_text = inst_lines[j])), date_added = Sys.time(), last_modified = Sys.time())
+    add_recipe(recipe)
+  }
+  invisible(TRUE)
+}
+
+backup_db <- function() {
+  dir <- file.path(path.expand("~"), ".recipeR", "backups")
+  if (!dir.exists(dir)) dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  src <- data_file()
+  if (!file.exists(src)) stop("No DB to backup")
+  dest <- file.path(dir, paste0("recipes_backup_", format(Sys.time(), "%Y%m%d%H%M%S"), ".rds"))
+  file.copy(src, dest)
+  dest
+}
+
+list_backups <- function() {
+  dir <- file.path(path.expand("~"), ".recipeR", "backups")
+  if (!dir.exists(dir)) return(character())
+  list.files(dir, full.names = TRUE)
+}
+
+restore_backup <- function(path) {
+  if (!file.exists(path)) stop("Backup not found")
+  file.copy(path, data_file(), overwrite = TRUE)
+  invisible(TRUE)
+}
+
+## Preferences
+prefs_file <- function() {
+  dir <- file.path(path.expand("~"), ".recipeR")
+  if (!dir.exists(dir)) dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  file.path(dir, "prefs.rds")
+}
+
+get_prefs <- function() {
+  f <- prefs_file()
+  if (!file.exists(f)) return(list(unit_system = "american"))
+  readRDS(f)
+}
+
+save_prefs <- function(prefs) {
+  f <- prefs_file()
+  saveRDS(prefs, f)
+  invisible(TRUE)
+}
+
 add_recipe <- function(recipe) {
   db <- load_db()
   if (is.null(db$recipes)) db$recipes <- list()

@@ -67,7 +67,38 @@ app_ui <- function(request) {
                  fluidRow(column(12, h4("Shopping list will appear here"), verbatimTextOutput("shopping_list")))
         ),
         tabPanel("Settings",
-                 fluidRow(column(12, h4("Settings"), p("App settings and data export/import")))
+                 fluidRow(
+                   column(12,
+                          h4("Settings"),
+                          p("App settings and data export/import"),
+                          hr(),
+                          h5("Units"),
+                          radioButtons("unit_system", "Preferred unit system:", choices = c("american" = "american", "european" = "european"), selected = "american", inline = TRUE),
+                          actionButton("save_prefs", "Save Preferences"),
+                          hr(),
+                          h5("Ingredient Densities"),
+                          p("View and edit ingredient densities (g/ml) for volume-to-mass conversions."),
+                          DT::dataTableOutput("densities_table"),
+                          br(),
+                          h5("Add Custom Density"),
+                          textInput("new_density_ingredient", "Ingredient name"),
+                          numericInput("new_density_value", "Density (g/ml)", value = 1.0, min = 0.1, step = 0.01),
+                          actionButton("add_density_btn", "Add Density"),
+                          hr(),
+                          h5("Export"),
+                          downloadButton("export_json", "Download JSON"),
+                          downloadButton("export_csv", "Download CSV"),
+                          br(), br(),
+                          h5("Import"),
+                          fileInput("import_file", "Choose JSON or CSV to import", accept = c('.json', '.csv')),
+                          actionButton("import_btn", "Import File"),
+                          hr(),
+                          h5("Backup / Restore"),
+                          actionButton("backup_btn", "Create Backup"),
+                          selectInput("restore_choice", "Restore from backup", choices = character()),
+                          actionButton("restore_btn", "Restore Selected Backup")
+                   )
+                 )
         )
       )
     )
