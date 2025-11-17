@@ -16,7 +16,10 @@ if (file.exists(custom_densities_file)) {
 cat("TEST 1: Initial density table (built-in only)\n")
 all_dens <- list_all_densities()
 cat(sprintf("  Total built-in densities: %d\n", nrow(all_dens)))
-cat(sprintf("  Sample: %s\n", paste(head(all_dens$ingredient, 3), collapse=", ")))
+cat(sprintf(
+  "  Sample: %s\n",
+  paste(head(all_dens$ingredient, 3), collapse = ", ")
+))
 print(head(all_dens, 3))
 cat("\n")
 
@@ -40,7 +43,10 @@ cat("\n")
 cat("TEST 4: Verify custom density is usable in conversions\n")
 dens_matcha <- get_density("matcha")
 cat(sprintf("  get_density('matcha') = %f\n", dens_matcha))
-cat(sprintf("  Expected: 0.72, Match: %s\n", ifelse(abs(dens_matcha - 0.72) < 0.001, "✓", "✗")))
+cat(sprintf(
+  "  Expected: 0.72, Match: %s\n",
+  ifelse(abs(dens_matcha - 0.72) < 0.001, "✓", "✗")
+))
 cat("\n")
 
 # Test 5: Test density-based conversion with custom ingredient
@@ -63,10 +69,17 @@ test_cases <- list(
 
 for (i in seq_along(test_cases)) {
   tc <- test_cases[[i]]
-  is_valid <- !(is.null(tc$name) || tc$name == "") && !(is.null(tc$value) || is.na(tc$value) || tc$value <= 0)
+  is_valid <- !(is.null(tc$name) || tc$name == "") &&
+    !(is.null(tc$value) || is.na(tc$value) || tc$value <= 0)
   match <- is_valid == tc$valid
   status <- if (match) "✓" else "✗"
-  cat(sprintf("  %s Case %d (%s): %s\n", status, i, tc$reason, if (match) "PASS" else "FAIL"))
+  cat(sprintf(
+    "  %s Case %d (%s): %s\n",
+    status,
+    i,
+    tc$reason,
+    if (match) "PASS" else "FAIL"
+  ))
 }
 cat("\n")
 

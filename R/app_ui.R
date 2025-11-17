@@ -7,9 +7,16 @@ ui_modern <- function() {
       tags$head(
         shinyjs::useShinyjs(),
         tags$meta(charset = "utf-8"),
-        tags$meta(name = "viewport", content = "width=device-width, initial-scale=1"),
-        tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"),
-        tags$style(HTML("
+        tags$meta(
+          name = "viewport",
+          content = "width=device-width, initial-scale=1"
+        ),
+        tags$link(
+          rel = "stylesheet",
+          href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        ),
+        tags$style(HTML(
+          "
           * {
             margin: 0;
             padding: 0;
@@ -558,20 +565,35 @@ ui_modern <- function() {
               gap: 0.5rem;
             }
           }
-        ")),
+        "
+        )),
         # Extra UX polish: toast/notification styling, spinner, and small accessibility helpers
         tags$style(HTML(
-".shiny-notification {\n  border-radius: 10px;\n  padding: 0.8rem 1rem;\n  box-shadow: 0 6px 18px rgba(2,6,23,0.12);\n  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));\n  border-left: 6px solid var(--primary);\n  color: var(--dark);\n  font-weight: 600;\n  min-width: 260px;\n}\n\n.shiny-notification.info { border-left-color: var(--info); }\n.shiny-notification.success { border-left-color: var(--success); }\n.shiny-notification.error { border-left-color: var(--danger); }\n\n/* Fullscreen spinner overlay for long ops */\n.spinner-overlay {\n  position: fixed;\n  inset: 0;\n  display: none;\n  align-items: center;\n  justify-content: center;\n  background: rgba(15, 23, 42, 0.4);\n  z-index: 2000;\n}\n\n.spinner-card {\n  background: white;\n  padding: 1.25rem 1.5rem;\n  border-radius: 10px;\n  box-shadow: var(--shadow-xl);\n  display: flex;\n  gap: 1rem;\n  align-items: center;\n}\n\n.skeleton {\n  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);\n  animation: shimmer 1.4s ease-in-out infinite;\n  border-radius: 8px;\n}\n\n@keyframes shimmer {\n  0% { background-position: -200px 0 }\n  100% { background-position: 200px 0 }\n}\n\n/* Focus visible for keyboard navigation */\n:focus {\n  outline: 3px solid rgba(99,102,241,0.18);\n  outline-offset: 2px;\n  box-shadow: 0 6px 18px rgba(99,102,241,0.08);\n}\n")),
+          ".shiny-notification {\n  border-radius: 10px;\n  padding: 0.8rem 1rem;\n  box-shadow: 0 6px 18px rgba(2,6,23,0.12);\n  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));\n  border-left: 6px solid var(--primary);\n  color: var(--dark);\n  font-weight: 600;\n  min-width: 260px;\n}\n\n.shiny-notification.info { border-left-color: var(--info); }\n.shiny-notification.success { border-left-color: var(--success); }\n.shiny-notification.error { border-left-color: var(--danger); }\n\n/* Fullscreen spinner overlay for long ops */\n.spinner-overlay {\n  position: fixed;\n  inset: 0;\n  display: none;\n  align-items: center;\n  justify-content: center;\n  background: rgba(15, 23, 42, 0.4);\n  z-index: 2000;\n}\n\n.spinner-card {\n  background: white;\n  padding: 1.25rem 1.5rem;\n  border-radius: 10px;\n  box-shadow: var(--shadow-xl);\n  display: flex;\n  gap: 1rem;\n  align-items: center;\n}\n\n.skeleton {\n  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);\n  animation: shimmer 1.4s ease-in-out infinite;\n  border-radius: 8px;\n}\n\n@keyframes shimmer {\n  0% { background-position: -200px 0 }\n  100% { background-position: 200px 0 }\n}\n\n/* Focus visible for keyboard navigation */\n:focus {\n  outline: 3px solid rgba(99,102,241,0.18);\n  outline-offset: 2px;\n  box-shadow: 0 6px 18px rgba(99,102,241,0.08);\n}\n"
+        )),
         # JS initializer: tooltips, autofocus search on tab, keyboard shortcut '/'
         tags$script(HTML(
-"document.addEventListener('DOMContentLoaded', function() {\n  // initialize Bootstrap tooltips for any element with data-bs-toggle\n  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'))\n  tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el) })\n\n  // Focus search when Browse Recipes tab is shown\n  var mainNav = document.getElementById('main_nav');\n  if (mainNav) {\n    mainNav.addEventListener('shown.bs.tab', function(e) {\n      var target = e.target;\n      var text = target && target.textContent ? target.textContent.trim() : '';\n      if (text.indexOf('Browse Recipes') !== -1) {\n        var el = document.getElementById('search_query');\n        if (el) setTimeout(function(){ el.focus(); }, 120);\n      }\n    })\n  }\n\n  // Quick search: press '/' to focus search input\n  document.addEventListener('keydown', function(e) {\n    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {\n      e.preventDefault();\n      var el = document.getElementById('search_query');\n      if (el) el.focus();\n    }\n  });\n});"))
+          "document.addEventListener('DOMContentLoaded', function() {\n  // initialize Bootstrap tooltips for any element with data-bs-toggle\n  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'))\n  tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el) })\n\n  // Focus search when Browse Recipes tab is shown\n  var mainNav = document.getElementById('main_nav');\n  if (mainNav) {\n    mainNav.addEventListener('shown.bs.tab', function(e) {\n      var target = e.target;\n      var text = target && target.textContent ? target.textContent.trim() : '';\n      if (text.indexOf('Browse Recipes') !== -1) {\n        var el = document.getElementById('search_query');\n        if (el) setTimeout(function(){ el.focus(); }, 120);\n      }\n    })\n  }\n\n  // Quick search: press '/' to focus search input\n  document.addEventListener('keydown', function(e) {\n    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {\n      e.preventDefault();\n      var el = document.getElementById('search_query');\n      if (el) el.focus();\n    }\n  });\n});"
+        ))
       ),
 
       # Global spinner overlay (toggleable from server via JS/show/hide)
-      tags$div(id = "global_spinner", class = "spinner-overlay",
-        tags$div(class = "spinner-card",
-          tags$i(class = "fas fa-spinner fa-pulse fa-2x", style = "color: var(--primary);"),
-          tags$div(tags$strong("Working"), tags$div(style = "font-size:0.9rem;color:var(--muted);", "Please wait..."))
+      tags$div(
+        id = "global_spinner",
+        class = "spinner-overlay",
+        tags$div(
+          class = "spinner-card",
+          tags$i(
+            class = "fas fa-spinner fa-pulse fa-2x",
+            style = "color: var(--primary);"
+          ),
+          tags$div(
+            tags$strong("Working"),
+            tags$div(
+              style = "font-size:0.9rem;color:var(--muted);",
+              "Please wait..."
+            )
+          )
         )
       ),
 
@@ -588,7 +610,11 @@ ui_modern <- function() {
             class = "modal-content",
             tags$div(
               class = "modal-header",
-              tags$h5(class = "modal-title", id = "recipe_title", "Recipe Details"),
+              tags$h5(
+                class = "modal-title",
+                id = "recipe_title",
+                "Recipe Details"
+              ),
               tags$button(
                 type = "button",
                 class = "btn-close",
@@ -597,43 +623,43 @@ ui_modern <- function() {
               )
             ),
 
-          # Recipe Compare Modal (side-by-side)
-          tags$div(
-            id = "recipe_compare_modal",
-            class = "modal fade",
-            tabindex = "-1",
-            role = "dialog",
+            # Recipe Compare Modal (side-by-side)
             tags$div(
-              class = "modal-dialog modal-xl",
-              role = "document",
+              id = "recipe_compare_modal",
+              class = "modal fade",
+              tabindex = "-1",
+              role = "dialog",
               tags$div(
-                class = "modal-content",
+                class = "modal-dialog modal-xl",
+                role = "document",
                 tags$div(
-                  class = "modal-header",
-                  tags$h5(class = "modal-title", "Compare Recipes"),
-                  tags$button(
-                    type = "button",
-                    class = "btn-close",
-                    `data-bs-dismiss` = "modal",
-                    `aria-label` = "Close"
-                  )
-                ),
-                tags$div(
-                  class = "modal-body",
-                  uiOutput("recipe_compare_content")
-                ),
-                tags$div(
-                  class = "modal-footer",
-                  tags$button(
-                    type = "button",
-                    class = "btn btn-secondary",
-                    `data-bs-dismiss` = "modal",
-                    "Close"
+                  class = "modal-content",
+                  tags$div(
+                    class = "modal-header",
+                    tags$h5(class = "modal-title", "Compare Recipes"),
+                    tags$button(
+                      type = "button",
+                      class = "btn-close",
+                      `data-bs-dismiss` = "modal",
+                      `aria-label` = "Close"
+                    )
+                  ),
+                  tags$div(
+                    class = "modal-body",
+                    uiOutput("recipe_compare_content")
+                  ),
+                  tags$div(
+                    class = "modal-footer",
+                    tags$button(
+                      type = "button",
+                      class = "btn btn-secondary",
+                      `data-bs-dismiss` = "modal",
+                      "Close"
+                    )
                   )
                 )
               )
-            )
-          ),
+            ),
             tags$div(
               class = "modal-body",
               uiOutput("recipe_detail_content")
@@ -650,7 +676,8 @@ ui_modern <- function() {
                 id = "edit_recipe_btn",
                 type = "button",
                 class = "btn btn-primary",
-                icon("edit"), "Edit Recipe"
+                icon("edit"),
+                "Edit Recipe"
               )
             )
           )
@@ -675,7 +702,10 @@ ui_modern <- function() {
             div(
               class = "section-header",
               h1(class = "section-title", "Welcome to recipeR"),
-              p(class = "section-subtitle", "Your personal AI-powered recipe manager with intelligent ingredient matching")
+              p(
+                class = "section-subtitle",
+                "Your personal AI-powered recipe manager with intelligent ingredient matching"
+              )
             ),
 
             # Stats Grid
@@ -712,8 +742,13 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    h5(icon("search", class = "icon-primary"), "Browse Recipes"),
-                    p("Search and filter through a curated collection of recipes with advanced filtering options")
+                    h5(
+                      icon("search", class = "icon-primary"),
+                      "Browse Recipes"
+                    ),
+                    p(
+                      "Search and filter through a curated collection of recipes with advanced filtering options"
+                    )
                   )
                 )
               ),
@@ -723,8 +758,13 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    h5(icon("plus-circle", class = "icon-secondary"), "Add Recipes"),
-                    p("Add new recipes from external sources to build your personal recipe collection")
+                    h5(
+                      icon("plus-circle", class = "icon-secondary"),
+                      "Add Recipes"
+                    ),
+                    p(
+                      "Add new recipes from external sources to build your personal recipe collection"
+                    )
                   )
                 )
               ),
@@ -735,7 +775,9 @@ ui_modern <- function() {
                   div(
                     class = "card-body",
                     h5(icon("gear", class = "icon-success"), "Manage Settings"),
-                    p("Configure preferences, manage ingredient densities, and import/export your recipes")
+                    p(
+                      "Configure preferences, manage ingredient densities, and import/export your recipes"
+                    )
                   )
                 )
               )
@@ -751,7 +793,10 @@ ui_modern <- function() {
             div(
               class = "section-header",
               h1(class = "section-title", "Browse Recipes"),
-              p(class = "section-subtitle", "Search and filter through your recipe collection")
+              p(
+                class = "section-subtitle",
+                "Search and filter through your recipe collection"
+              )
             ),
 
             # Search
@@ -761,7 +806,12 @@ ui_modern <- function() {
                 class = "col-md-12",
                 div(
                   class = "input-group",
-                  textInput("search_query", NULL, placeholder = "Search recipes by title...", width = "100%"),
+                  textInput(
+                    "search_query",
+                    NULL,
+                    placeholder = "Search recipes by title...",
+                    width = "100%"
+                  ),
                   tags$span(class = "input-group-text", icon("search"))
                 )
               )
@@ -775,7 +825,11 @@ ui_modern <- function() {
                 div(
                   style = "display: flex; justify-content: space-between; align-items: center;",
                   h5(style = "margin: 0;", icon("filter"), "Advanced Filters"),
-                  actionButton("toggle_filters", "Show/Hide", class = "btn btn-sm btn-secondary")
+                  actionButton(
+                    "toggle_filters",
+                    "Show/Hide",
+                    class = "btn btn-sm btn-secondary"
+                  )
                 )
               ),
               div(
@@ -790,7 +844,13 @@ ui_modern <- function() {
                     shinyWidgets::pickerInput(
                       "cuisine_filter",
                       NULL,
-                      choices = c("Chinese Cuisine", "Thai Cuisine", "Japanese Cuisine", "Indian Cuisine", "Vietnamese Cuisine"),
+                      choices = c(
+                        "Chinese Cuisine",
+                        "Thai Cuisine",
+                        "Japanese Cuisine",
+                        "Indian Cuisine",
+                        "Vietnamese Cuisine"
+                      ),
                       selected = NULL,
                       multiple = TRUE,
                       options = list(
@@ -819,8 +879,16 @@ ui_modern <- function() {
                   class = "row",
                   div(
                     class = "col-md-12",
-                    actionButton("reset_filters", "Reset All Filters", class = "btn btn-warning btn-sm"),
-                    actionButton("select_all_filters", "Select All", class = "btn btn-info btn-sm ms-2")
+                    actionButton(
+                      "reset_filters",
+                      "Reset All Filters",
+                      class = "btn btn-warning btn-sm"
+                    ),
+                    actionButton(
+                      "select_all_filters",
+                      "Select All",
+                      class = "btn btn-info btn-sm ms-2"
+                    )
                   )
                 )
               )
@@ -866,11 +934,24 @@ ui_modern <- function() {
                 ),
                 div(
                   class = "mt-3",
-                  p(class = "text-muted small", 
-                    "Click on a recipe row to view details. Tip: Use the search and filters above to narrow down your search."),
-                  div(class = "mt-2",
-                    actionButton("compare_selected", "Compare Selected", class = "btn btn-secondary btn-sm", title = "Compare two selected recipes", `data-bs-toggle` = "tooltip", `aria-label` = "Compare Selected Recipes"),
-                    span(class = "ms-3 text-muted small", "Select exactly two rows and click Compare to view a side-by-side comparison.")
+                  p(
+                    class = "text-muted small",
+                    "Click on a recipe row to view details. Tip: Use the search and filters above to narrow down your search."
+                  ),
+                  div(
+                    class = "mt-2",
+                    actionButton(
+                      "compare_selected",
+                      "Compare Selected",
+                      class = "btn btn-secondary btn-sm",
+                      title = "Compare two selected recipes",
+                      `data-bs-toggle` = "tooltip",
+                      `aria-label` = "Compare Selected Recipes"
+                    ),
+                    span(
+                      class = "ms-3 text-muted small",
+                      "Select exactly two rows and click Compare to view a side-by-side comparison."
+                    )
                   )
                 )
               )
@@ -886,7 +967,10 @@ ui_modern <- function() {
             div(
               class = "section-header",
               h1(class = "section-title", "Add New Recipe"),
-              p(class = "section-subtitle", "Create a new recipe to add to your collection")
+              p(
+                class = "section-subtitle",
+                "Create a new recipe to add to your collection"
+              )
             ),
 
             div(
@@ -897,17 +981,57 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    textInput("new_title", "Recipe Title", placeholder = "e.g., Vegetable Pad Thai", width = "100%"),
-                    textInput("new_source", "Cuisine/Source", placeholder = "e.g., Thai Cuisine", width = "100%"),
-                    textInput("new_source_url", "Source URL (optional)", width = "100%"),
+                    textInput(
+                      "new_title",
+                      "Recipe Title",
+                      placeholder = "e.g., Vegetable Pad Thai",
+                      width = "100%"
+                    ),
+                    textInput(
+                      "new_source",
+                      "Cuisine/Source",
+                      placeholder = "e.g., Thai Cuisine",
+                      width = "100%"
+                    ),
+                    textInput(
+                      "new_source_url",
+                      "Source URL (optional)",
+                      width = "100%"
+                    ),
                     h5("Ingredients (one per line)"),
-                    textAreaInput("new_ingredients_raw", NULL, placeholder = "1 1/2 cups flour\n2 eggs\n3 tbsp sugar", rows = 6, width = "100%"),
+                    textAreaInput(
+                      "new_ingredients_raw",
+                      NULL,
+                      placeholder = "1 1/2 cups flour\n2 eggs\n3 tbsp sugar",
+                      rows = 6,
+                      width = "100%"
+                    ),
                     h5("Instructions (one per line)"),
-                    textAreaInput("new_instructions", NULL, placeholder = "Mix dry ingredients\nAdd wet ingredients\nBake at 350°F for 30 minutes", rows = 6, width = "100%"),
+                    textAreaInput(
+                      "new_instructions",
+                      NULL,
+                      placeholder = "Mix dry ingredients\nAdd wet ingredients\nBake at 350°F for 30 minutes",
+                      rows = 6,
+                      width = "100%"
+                    ),
                     div(
                       class = "mt-4",
-                      actionButton("save_recipe", "Save Recipe", class = "btn btn-primary btn-lg", title = "Save recipe (Ctrl+S)", `data-bs-toggle` = "tooltip" , `aria-label` = "Save Recipe"),
-                      actionButton("clear_recipe", "Clear", class = "btn btn-secondary btn-lg ms-2", title = "Clear the form", `data-bs-toggle` = "tooltip", `aria-label` = "Clear Recipe Form")
+                      actionButton(
+                        "save_recipe",
+                        "Save Recipe",
+                        class = "btn btn-primary btn-lg",
+                        title = "Save recipe (Ctrl+S)",
+                        `data-bs-toggle` = "tooltip",
+                        `aria-label` = "Save Recipe"
+                      ),
+                      actionButton(
+                        "clear_recipe",
+                        "Clear",
+                        class = "btn btn-secondary btn-lg ms-2",
+                        title = "Clear the form",
+                        `data-bs-toggle` = "tooltip",
+                        `aria-label` = "Clear Recipe Form"
+                      )
                     )
                   )
                 )
@@ -943,16 +1067,34 @@ ui_modern <- function() {
                       ),
                       div(
                         class = "col-md-4",
-                        numericInput("ing_qty", "Quantity", value = 1, min = 0, width = "100%")
+                        numericInput(
+                          "ing_qty",
+                          "Quantity",
+                          value = 1,
+                          min = 0,
+                          width = "100%"
+                        )
                       ),
                       div(
                         class = "col-md-4",
-                        textInput("ing_unit", "Unit", placeholder = "cup, tsp, oz, g, etc.", width = "100%")
+                        textInput(
+                          "ing_unit",
+                          "Unit",
+                          placeholder = "cup, tsp, oz, g, etc.",
+                          width = "100%"
+                        )
                       )
                     ),
                     div(
                       class = "mt-3",
-                      actionButton("save_ing", "Add Ingredient", class = "btn btn-primary", title = "Add or update ingredient", `data-bs-toggle` = "tooltip", `aria-label` = "Add Ingredient")
+                      actionButton(
+                        "save_ing",
+                        "Add Ingredient",
+                        class = "btn btn-primary",
+                        title = "Add or update ingredient",
+                        `data-bs-toggle` = "tooltip",
+                        `aria-label` = "Add Ingredient"
+                      )
                     )
                   )
                 )
@@ -990,12 +1132,29 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-header",
-                    tags$i(class = "fas fa-ruler icon-primary"), "Unit Preferences"
+                    tags$i(class = "fas fa-ruler icon-primary"),
+                    "Unit Preferences"
                   ),
                   div(
                     class = "card-body",
-                    radioButtons("unit_system", "Preferred Unit System", choices = c("american" = "american", "european" = "european"), selected = "american", inline = TRUE),
-                    actionButton("save_prefs", "Save Preferences", class = "btn btn-primary mt-3", title = "Save preferences", `data-bs-toggle` = "tooltip", `aria-label` = "Save Preferences")
+                    radioButtons(
+                      "unit_system",
+                      "Preferred Unit System",
+                      choices = c(
+                        "american" = "american",
+                        "european" = "european"
+                      ),
+                      selected = "american",
+                      inline = TRUE
+                    ),
+                    actionButton(
+                      "save_prefs",
+                      "Save Preferences",
+                      class = "btn btn-primary mt-3",
+                      title = "Save preferences",
+                      `data-bs-toggle` = "tooltip",
+                      `aria-label` = "Save Preferences"
+                    )
                   )
                 ),
 
@@ -1004,11 +1163,14 @@ ui_modern <- function() {
                   class = "card mt-4",
                   div(
                     class = "card-header",
-                    tags$i(class = "fas fa-flask icon-primary"), "Ingredient Densities"
+                    tags$i(class = "fas fa-flask icon-primary"),
+                    "Ingredient Densities"
                   ),
                   div(
                     class = "card-body",
-                    p("View and edit ingredient densities (g/ml) for volume-to-mass conversions."),
+                    p(
+                      "View and edit ingredient densities (g/ml) for volume-to-mass conversions."
+                    ),
                     DT::dataTableOutput("densities_table"),
                     div(
                       class = "mt-4",
@@ -1017,14 +1179,32 @@ ui_modern <- function() {
                         class = "row",
                         div(
                           class = "col-md-6",
-                          textInput("new_density_ingredient", "Ingredient name", width = "100%")
+                          textInput(
+                            "new_density_ingredient",
+                            "Ingredient name",
+                            width = "100%"
+                          )
                         ),
                         div(
                           class = "col-md-6",
-                          numericInput("new_density_value", "Density (g/ml)", value = 1.0, min = 0.1, step = 0.01, width = "100%")
+                          numericInput(
+                            "new_density_value",
+                            "Density (g/ml)",
+                            value = 1.0,
+                            min = 0.1,
+                            step = 0.01,
+                            width = "100%"
+                          )
                         )
                       ),
-                      actionButton("add_density_btn", "Add Density", class = "btn btn-success mt-3", title = "Add a custom density", `data-bs-toggle` = "tooltip", `aria-label` = "Add Density")
+                      actionButton(
+                        "add_density_btn",
+                        "Add Density",
+                        class = "btn btn-success mt-3",
+                        title = "Add a custom density",
+                        `data-bs-toggle` = "tooltip",
+                        `aria-label` = "Add Density"
+                      )
                     )
                   )
                 ),
@@ -1034,7 +1214,8 @@ ui_modern <- function() {
                   class = "card mt-4",
                   div(
                     class = "card-header",
-                    tags$i(class = "fas fa-exchange-alt icon-primary"), "Import & Export"
+                    tags$i(class = "fas fa-exchange-alt icon-primary"),
+                    "Import & Export"
                   ),
                   div(
                     class = "card-body",
@@ -1043,16 +1224,35 @@ ui_modern <- function() {
                       class = "row",
                       div(
                         class = "col-md-6",
-                        downloadButton("export_json", "Download JSON", class = "btn btn-primary w-100")
+                        downloadButton(
+                          "export_json",
+                          "Download JSON",
+                          class = "btn btn-primary w-100"
+                        )
                       ),
                       div(
                         class = "col-md-6",
-                        downloadButton("export_csv", "Download CSV", class = "btn btn-primary w-100")
+                        downloadButton(
+                          "export_csv",
+                          "Download CSV",
+                          class = "btn btn-primary w-100"
+                        )
                       )
                     ),
                     h5("Import Recipes", class = "mt-4"),
-                    fileInput("import_file", "Choose JSON or CSV to import", accept = c('.json', '.csv')),
-                    actionButton("import_btn", "Import File", class = "btn btn-success", title = "Import recipes from JSON or CSV", `data-bs-toggle` = "tooltip", `aria-label` = "Import File")
+                    fileInput(
+                      "import_file",
+                      "Choose JSON or CSV to import",
+                      accept = c('.json', '.csv')
+                    ),
+                    actionButton(
+                      "import_btn",
+                      "Import File",
+                      class = "btn btn-success",
+                      title = "Import recipes from JSON or CSV",
+                      `data-bs-toggle` = "tooltip",
+                      `aria-label` = "Import File"
+                    )
                   )
                 )
               )

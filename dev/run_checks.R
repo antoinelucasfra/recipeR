@@ -13,7 +13,10 @@ rec <- list(
     list(ingredient_name = "milk", raw_text = "1.5 cups milk"),
     list(ingredient_name = "egg", raw_text = "1 egg")
   ),
-  instructions = list(list(step_number = 1, instruction_text = "Mix"), list(step_number = 2, instruction_text = "Cook")),
+  instructions = list(
+    list(step_number = 1, instruction_text = "Mix"),
+    list(step_number = 2, instruction_text = "Cook")
+  ),
   date_added = Sys.time(),
   last_modified = Sys.time()
 )
@@ -21,8 +24,16 @@ rec <- list(
 add_recipe(rec)
 
 # Add inventory
-add_ingredient(list(ingredient_name = "flour", quantity_available = 5, unit = "cups"))
-add_ingredient(list(ingredient_name = "milk", quantity_available = 2, unit = "cups"))
+add_ingredient(list(
+  ingredient_name = "flour",
+  quantity_available = 5,
+  unit = "cups"
+))
+add_ingredient(list(
+  ingredient_name = "milk",
+  quantity_available = 2,
+  unit = "cups"
+))
 
 # Show recipes and ingredients
 print(str(get_recipes()))
@@ -36,7 +47,9 @@ if (length(recs) > 0) {
   inv <- get_ingredients()
   inv_names <- tolower(sapply(inv, function(x) x$ingredient_name))
   req_names <- tolower(sapply(r$ingredients, function(i) i$ingredient_name))
-  matched <- sum(sapply(req_names, function(rr) any(grepl(rr, inv_names, fixed = TRUE))))
+  matched <- sum(sapply(req_names, function(rr) {
+    any(grepl(rr, inv_names, fixed = TRUE))
+  }))
   pct <- round(100 * matched / length(req_names))
   cat(sprintf("Match for '%s': %s%%\n", r$title, pct))
 }

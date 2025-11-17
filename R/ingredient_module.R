@@ -2,7 +2,13 @@
 # Encapsulates ingredient CRUD and inventory operations
 
 ## Create or update ingredient in inventory
-upsert_ingredient <- function(name, quantity = 0, unit = "", category = NA, is_staple = FALSE) {
+upsert_ingredient <- function(
+  name,
+  quantity = 0,
+  unit = "",
+  category = NA,
+  is_staple = FALSE
+) {
   if (is.null(name) || trimws(name) == "") {
     stop("Ingredient name is required")
   }
@@ -40,12 +46,17 @@ has_ingredient <- function(name) {
 ## Get all ingredients sorted by category
 get_ingredients_by_category <- function() {
   ings <- get_ingredients()
-  if (length(ings) == 0) return(list())
+  if (length(ings) == 0) {
+    return(list())
+  }
 
   # Group by category
-  categories <- lapply(unique(sapply(ings, function(i) i$category %||% "Uncategorized")), function(cat) {
-    Filter(function(i) (i$category %||% "Uncategorized") == cat, ings)
-  })
+  categories <- lapply(
+    unique(sapply(ings, function(i) i$category %||% "Uncategorized")),
+    function(cat) {
+      Filter(function(i) (i$category %||% "Uncategorized") == cat, ings)
+    }
+  )
 
   categories
 }
@@ -82,7 +93,10 @@ import_ingredients_bulk <- function(ingredients_df) {
 
   required_cols <- c("name", "quantity")
   if (!all(required_cols %in% names(ingredients_df))) {
-    stop(sprintf("Data frame must contain columns: %s", paste(required_cols, collapse = ", ")))
+    stop(sprintf(
+      "Data frame must contain columns: %s",
+      paste(required_cols, collapse = ", ")
+    ))
   }
 
   count <- 0
@@ -109,6 +123,10 @@ get_inventory_stats <- function() {
     total_items = length(ings),
     staple_count = length(get_staple_ingredients()),
     shopping_count = length(get_shopping_ingredients()),
-    avg_quantity = if (length(ings) > 0) mean(sapply(ings, function(i) i$quantity_available)) else 0
+    avg_quantity = if (length(ings) > 0) {
+      mean(sapply(ings, function(i) i$quantity_available))
+    } else {
+      0
+    }
   )
 }

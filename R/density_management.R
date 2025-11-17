@@ -2,13 +2,17 @@
 
 densities_file <- function() {
   dir <- file.path(path.expand("~"), ".recipeR")
-  if (!dir.exists(dir)) dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(dir)) {
+    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  }
   file.path(dir, "densities.rds")
 }
 
 get_custom_densities <- function() {
   f <- densities_file()
-  if (!file.exists(f)) return(list())
+  if (!file.exists(f)) {
+    return(list())
+  }
   readRDS(f)
 }
 

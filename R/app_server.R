@@ -26,7 +26,9 @@ app_server <- function(input, output, session) {
   })
 
   output$stat_cuisines <- renderText({
-    if (length(rv$recipes) == 0) return("0")
+    if (length(rv$recipes) == 0) {
+      return("0")
+    }
     length(unique(sapply(rv$recipes, function(r) r$source)))
   })
 
@@ -35,7 +37,9 @@ app_server <- function(input, output, session) {
   })
 
   output$stat_avg_ingredients <- renderText({
-    if (length(rv$recipes) == 0) return("0")
+    if (length(rv$recipes) == 0) {
+      return("0")
+    }
     round(mean(sapply(rv$recipes, function(r) length(r$ingredients))), 1)
   })
 
@@ -54,8 +58,18 @@ app_server <- function(input, output, session) {
 
   # Select All Filters
   observeEvent(input$select_all_filters, {
-    all_cuisines <- c("Chinese Cuisine", "Thai Cuisine", "Japanese Cuisine", "Indian Cuisine", "Vietnamese Cuisine")
-    shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = all_cuisines)
+    all_cuisines <- c(
+      "Chinese Cuisine",
+      "Thai Cuisine",
+      "Japanese Cuisine",
+      "Indian Cuisine",
+      "Vietnamese Cuisine"
+    )
+    shinyWidgets::updatePickerInput(
+      session,
+      "cuisine_filter",
+      selected = all_cuisines
+    )
     showNotification("All cuisines selected", type = "message")
   })
 
@@ -83,25 +97,37 @@ app_server <- function(input, output, session) {
 
     # Apply source filter
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
 
     # Build display dataframe
     if (length(recs) == 0) {
-      df <- data.frame(Title = character(), Cuisine = character(), Ingredients = integer(), Steps = integer(), Added = character())
+      df <- data.frame(
+        Title = character(),
+        Cuisine = character(),
+        Ingredients = integer(),
+        Steps = integer(),
+        Added = character()
+      )
       return(DT::datatable(df))
     }
 
-    df <- do.call(rbind, lapply(recs, function(r) {
-      data.frame(
-        Title = r$title,
-        Cuisine = r$source,
-        Ingredients = length(r$ingredients),
-        Steps = length(r$instructions),
-        Added = format(r$date_added, "%Y-%m-%d"),
-        stringsAsFactors = FALSE
-      )
-    }))
+    df <- do.call(
+      rbind,
+      lapply(recs, function(r) {
+        data.frame(
+          Title = r$title,
+          Cuisine = r$source,
+          Ingredients = length(r$ingredients),
+          Steps = length(r$instructions),
+          Added = format(r$date_added, "%Y-%m-%d"),
+          stringsAsFactors = FALSE
+        )
+      })
+    )
 
     DT::datatable(
       df,
@@ -132,7 +158,10 @@ app_server <- function(input, output, session) {
       recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
     length(recs)
   })
@@ -147,9 +176,14 @@ app_server <- function(input, output, session) {
       recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
-    if (length(recs) == 0) return("0")
+    if (length(recs) == 0) {
+      return("0")
+    }
     round(mean(sapply(recs, function(r) length(r$ingredients))), 1)
   })
 
@@ -163,9 +197,14 @@ app_server <- function(input, output, session) {
       recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
-    if (length(recs) == 0) return("0")
+    if (length(recs) == 0) {
+      return("0")
+    }
     round(mean(sapply(recs, function(r) length(r$instructions))), 1)
   })
 
@@ -179,16 +218,23 @@ app_server <- function(input, output, session) {
       recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
-    if (length(recs) == 0) return("0")
+    if (length(recs) == 0) {
+      return("0")
+    }
     length(unique(sapply(recs, function(r) r$source)))
   })
 
   # Recipe detail modal - show selected recipe
   observeEvent(input$recipes_table_display_rows_selected, {
     rows <- input$recipes_table_display_rows_selected
-    if (is.null(rows) || length(rows) == 0) return()
+    if (is.null(rows) || length(rows) == 0) {
+      return()
+    }
 
     # only open detail modal when a single row is selected
     if (length(rows) == 1) {
@@ -204,7 +250,10 @@ app_server <- function(input, output, session) {
         recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
       }
       if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-        recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+        recs <- Filter(
+          function(r) (r$source_url %||% "") %in% input$source_filter,
+          recs
+        )
       }
 
       recs_list <- recs[names(recs)]
@@ -223,7 +272,10 @@ app_server <- function(input, output, session) {
   observeEvent(input$compare_selected, {
     sel <- input$recipes_table_display_rows_selected
     if (is.null(sel) || length(sel) != 2) {
-      showNotification("Please select exactly two recipes to compare.", type = "error")
+      showNotification(
+        "Please select exactly two recipes to compare.",
+        type = "error"
+      )
       return()
     }
 
@@ -237,13 +289,19 @@ app_server <- function(input, output, session) {
       recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
-      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      recs <- Filter(
+        function(r) (r$source_url %||% "") %in% input$source_filter,
+        recs
+      )
     }
 
     recs_list <- recs[names(recs)]
     # validate indices
     if (any(sel < 1) || any(sel > length(recs_list))) {
-      showNotification("Selected rows are out of range after filtering.", type = "error")
+      showNotification(
+        "Selected rows are out of range after filtering.",
+        type = "error"
+      )
       return()
     }
 
@@ -259,20 +317,25 @@ app_server <- function(input, output, session) {
 
   # Render recipe detail content
   output$recipe_detail_content <- renderUI({
-    if (is.null(selected_recipe)) return(tags$p("No recipe selected"))
-    
+    if (is.null(selected_recipe)) {
+      return(tags$p("No recipe selected"))
+    }
+
     r <- selected_recipe
-    
+
     # Build ingredients list
     ingredients_html <- lapply(r$ingredients, function(i) {
       tags$div(
         class = "ingredient-item",
-        icon("check-circle", style = "color: var(--success); margin-right: 0.5rem;"),
+        icon(
+          "check-circle",
+          style = "color: var(--success); margin-right: 0.5rem;"
+        ),
         strong(i$ingredient_name),
         if (!is.null(i$raw_text)) paste0(" (", i$raw_text, ")")
       )
     })
-    
+
     # Build instructions list
     instructions_html <- lapply(seq_along(r$instructions), function(idx) {
       instr <- r$instructions[[idx]]
@@ -282,7 +345,7 @@ app_server <- function(input, output, session) {
         instr$instruction_text
       )
     })
-    
+
     list(
       # Recipe metadata
       tags$div(
@@ -308,27 +371,32 @@ app_server <- function(input, output, session) {
           tags$div(class = "value", format(r$date_added, "%b %d"))
         )
       ),
-      
+
       # Ingredients section
       tags$div(
         class = "detail-section",
         tags$h6(icon("carrot"), "Ingredients"),
         tags$div(ingredients_html)
       ),
-      
+
       # Instructions section
       tags$div(
         class = "detail-section",
         tags$h6(icon("list-check"), "Instructions"),
         tags$div(instructions_html)
       ),
-      
+
       # Source URL if available
       if (!is.null(r$source_url) && r$source_url != "") {
         tags$div(
           class = "detail-section",
           tags$h6(icon("link"), "Source"),
-          tags$a(href = r$source_url, target = "_blank", r$source_url, class = "btn btn-sm btn-outline-primary")
+          tags$a(
+            href = r$source_url,
+            target = "_blank",
+            r$source_url,
+            class = "btn btn-sm btn-outline-primary"
+          )
         )
       }
     )
@@ -343,7 +411,9 @@ app_server <- function(input, output, session) {
 
     make_col <- function(r) {
       # ingredients list
-      ings <- lapply(r$ingredients, function(i) tags$li(if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name))
+      ings <- lapply(r$ingredients, function(i) {
+        tags$li(if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name)
+      })
       # short instructions (first 6 steps)
       inst <- lapply(seq_along(r$instructions), function(idx) {
         txt <- r$instructions[[idx]]$instruction_text
@@ -352,18 +422,39 @@ app_server <- function(input, output, session) {
 
       tags$div(
         class = "col-md-6",
-        tags$div(class = "card",
-          tags$div(class = "card-body",
+        tags$div(
+          class = "card",
+          tags$div(
+            class = "card-body",
             tags$h4(r$title, style = "color: var(--primary);"),
-            tags$div(class = "recipe-metadata",
-              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Cuisine"), tags$div(class = "value", r$source)),
-              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Ingredients"), tags$div(class = "value", length(r$ingredients))),
-              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Steps"), tags$div(class = "value", length(r$instructions)))
+            tags$div(
+              class = "recipe-metadata",
+              tags$div(
+                class = "recipe-metadata-item",
+                tags$div(class = "label", "Cuisine"),
+                tags$div(class = "value", r$source)
+              ),
+              tags$div(
+                class = "recipe-metadata-item",
+                tags$div(class = "label", "Ingredients"),
+                tags$div(class = "value", length(r$ingredients))
+              ),
+              tags$div(
+                class = "recipe-metadata-item",
+                tags$div(class = "label", "Steps"),
+                tags$div(class = "value", length(r$instructions))
+              )
             ),
             tags$h6("Ingredients"),
-            tags$ul(ings, style = "max-height:220px; overflow:auto; padding-left:1rem;"),
+            tags$ul(
+              ings,
+              style = "max-height:220px; overflow:auto; padding-left:1rem;"
+            ),
             tags$h6("Instructions"),
-            tags$ol(inst, style = "max-height:220px; overflow:auto; padding-left:1rem;")
+            tags$ol(
+              inst,
+              style = "max-height:220px; overflow:auto; padding-left:1rem;"
+            )
           )
         )
       )
@@ -382,7 +473,13 @@ app_server <- function(input, output, session) {
     lines <- lines[lines != ""]
     lapply(seq_along(lines), function(i) {
       parsed <- parse_ingredient_line(lines[i])
-      list(ingredient_name = parsed$name, raw_text = parsed$raw, quantity = parsed$quantity, unit = parsed$unit, is_optional = FALSE)
+      list(
+        ingredient_name = parsed$name,
+        raw_text = parsed$raw,
+        quantity = parsed$quantity,
+        unit = parsed$unit,
+        is_optional = FALSE
+      )
     })
   }
 
@@ -393,7 +490,10 @@ app_server <- function(input, output, session) {
       showNotification("Please provide a recipe title.", type = "error")
       return()
     }
-    instr_lines <- unlist(strsplit(as.character(input$new_instructions), "[\r\n]+"))
+    instr_lines <- unlist(strsplit(
+      as.character(input$new_instructions),
+      "[\r\n]+"
+    ))
     instr_lines <- trimws(instr_lines)
     instr_lines <- instr_lines[instr_lines != ""]
     recipe <- list(
@@ -401,12 +501,17 @@ app_server <- function(input, output, session) {
       source = input$new_source,
       source_url = NULL,
       ingredients = parse_ingredients_raw(input$new_ingredients_raw),
-      instructions = lapply(seq_along(instr_lines), function(i) list(step_number = i, instruction_text = instr_lines[i])),
+      instructions = lapply(seq_along(instr_lines), function(i) {
+        list(step_number = i, instruction_text = instr_lines[i])
+      }),
       date_added = Sys.time(),
       last_modified = Sys.time()
     )
     added <- add_recipe(recipe)
-    showNotification(sprintf("Saved recipe '%s'", added$title), type = "message")
+    showNotification(
+      sprintf("Saved recipe '%s'", added$title),
+      type = "message"
+    )
     updateTextInput(session, "new_title", value = "")
     updateTextAreaInput(session, "new_ingredients_raw", value = "")
     updateTextAreaInput(session, "new_instructions", value = "")
@@ -423,7 +528,10 @@ app_server <- function(input, output, session) {
   })
 
   output$new_recipe_preview <- renderPrint({
-    list(title = input$new_title, ingredients = parse_ingredients_raw(input$new_ingredients_raw))
+    list(
+      title = input$new_title,
+      ingredients = parse_ingredients_raw(input$new_ingredients_raw)
+    )
   })
 
   # Ingredients: add/update
@@ -433,9 +541,18 @@ app_server <- function(input, output, session) {
       showNotification("Provide ingredient name", type = "error")
       return()
     }
-    ing <- list(ingredient_name = name, quantity_available = input$ing_qty, unit = input$ing_unit, category = NA, is_staple = FALSE)
+    ing <- list(
+      ingredient_name = name,
+      quantity_available = input$ing_qty,
+      unit = input$ing_unit,
+      category = NA,
+      is_staple = FALSE
+    )
     add_ingredient(ing)
-    showNotification(sprintf("Added/updated ingredient '%s'", name), type = "message")
+    showNotification(
+      sprintf("Added/updated ingredient '%s'", name),
+      type = "message"
+    )
     updateTextInput(session, "ing_name", value = "")
     updateNumericInput(session, "ing_qty", value = NA)
     updateTextInput(session, "ing_unit", value = "")
@@ -452,98 +569,256 @@ app_server <- function(input, output, session) {
       # create a local binding so each observer captures the right id
       local({
         id_now <- rid
-        observeEvent(input[[btn]], {
-          r <- rv$recipes[[id_now]]
-          if (is.null(r)) return()
-          inv <- rv$ingredients
-          # compute missing ingredients
-          inv_names <- tolower(sapply(inv, function(x) if (!is.null(x$ingredient_name)) x$ingredient_name else ""))
-          req_names <- sapply(r$ingredients, function(i) i$ingredient_name)
-          missing <- req_names[!sapply(tolower(req_names), function(rr) any(grepl(rr, inv_names, fixed = TRUE)))]
+        observeEvent(
+          input[[btn]],
+          {
+            r <- rv$recipes[[id_now]]
+            if (is.null(r)) {
+              return()
+            }
+            inv <- rv$ingredients
+            # compute missing ingredients
+            inv_names <- tolower(sapply(inv, function(x) {
+              if (!is.null(x$ingredient_name)) x$ingredient_name else ""
+            }))
+            req_names <- sapply(r$ingredients, function(i) i$ingredient_name)
+            missing <- req_names[
+              !sapply(tolower(req_names), function(rr) {
+                any(grepl(rr, inv_names, fixed = TRUE))
+              })
+            ]
 
-          modal <- modalDialog(
-            title = r$title,
-            fluidPage(
-              fluidRow(column(6, h5("Ingredients"), tags$ul(lapply(r$ingredients, function(i) tags$li(i$raw_text)))),
-                       column(6, h5("Instructions"), tags$ol(lapply(r$instructions, function(s) tags$li(s$instruction_text))))) ,
-              fluidRow(column(6, numericInput(inputId = paste0("scale_", id_now), label = "Scale servings (multiplier)", value = 1, min = 0.25, step = 0.25)),
-                       column(6, actionButton(inputId = paste0("addshop_", id_now), label = "Add missing to shopping list", class = "btn-success"),
-                              actionButton(inputId = paste0("save_scaled_", id_now), label = "Save scaled as new recipe", class = "btn-primary")))
-            ),
-            easyClose = TRUE,
-            footer = modalButton("Close")
-          )
-          showModal(modal)
-          # react to scale changes by re-showing modal with scaled ingredient displays
-          scale_input_id <- paste0("scale_", id_now)
-          observeEvent(input[[scale_input_id]], {
-            mult <- as.numeric(input[[scale_input_id]])
-            if (is.null(mult) || is.na(mult)) mult <- 1
-            scaled_ings <- lapply(r$ingredients, function(i) {
-              si <- scale_ingredient(i, mult)
-              if (!is.null(si$quantity_display) && !is.na(si$quantity_display)) paste0(si$quantity_display, " ", ifelse(is.null(si$unit) || is.na(si$unit), "", si$unit), " ", si$name) else si$raw
-            })
-            modal2 <- modalDialog(
+            modal <- modalDialog(
               title = r$title,
               fluidPage(
-                fluidRow(column(6, h5("Ingredients"), tags$ul(lapply(scaled_ings, function(x) tags$li(x)))),
-                         column(6, h5("Instructions"), tags$ol(lapply(r$instructions, function(s) tags$li(s$instruction_text))))) ,
-                fluidRow(column(6, numericInput(inputId = scale_input_id, label = "Scale servings (multiplier)", value = mult, min = 0.25, step = 0.25)),
-                         column(6, actionButton(inputId = paste0("addshop_", id_now), label = "Add missing to shopping list", class = "btn-success")))
+                fluidRow(
+                  column(
+                    6,
+                    h5("Ingredients"),
+                    tags$ul(lapply(r$ingredients, function(i) {
+                      tags$li(i$raw_text)
+                    }))
+                  ),
+                  column(
+                    6,
+                    h5("Instructions"),
+                    tags$ol(lapply(r$instructions, function(s) {
+                      tags$li(s$instruction_text)
+                    }))
+                  )
+                ),
+                fluidRow(
+                  column(
+                    6,
+                    numericInput(
+                      inputId = paste0("scale_", id_now),
+                      label = "Scale servings (multiplier)",
+                      value = 1,
+                      min = 0.25,
+                      step = 0.25
+                    )
+                  ),
+                  column(
+                    6,
+                    actionButton(
+                      inputId = paste0("addshop_", id_now),
+                      label = "Add missing to shopping list",
+                      class = "btn-success"
+                    ),
+                    actionButton(
+                      inputId = paste0("save_scaled_", id_now),
+                      label = "Save scaled as new recipe",
+                      class = "btn-primary"
+                    )
+                  )
+                )
               ),
               easyClose = TRUE,
               footer = modalButton("Close")
             )
-            removeModal()
-            showModal(modal2)
-          }, ignoreInit = TRUE)
-        }, ignoreInit = TRUE)
+            showModal(modal)
+            # react to scale changes by re-showing modal with scaled ingredient displays
+            scale_input_id <- paste0("scale_", id_now)
+            observeEvent(
+              input[[scale_input_id]],
+              {
+                mult <- as.numeric(input[[scale_input_id]])
+                if (is.null(mult) || is.na(mult)) {
+                  mult <- 1
+                }
+                scaled_ings <- lapply(r$ingredients, function(i) {
+                  si <- scale_ingredient(i, mult)
+                  if (
+                    !is.null(si$quantity_display) && !is.na(si$quantity_display)
+                  ) {
+                    paste0(
+                      si$quantity_display,
+                      " ",
+                      ifelse(is.null(si$unit) || is.na(si$unit), "", si$unit),
+                      " ",
+                      si$name
+                    )
+                  } else {
+                    si$raw
+                  }
+                })
+                modal2 <- modalDialog(
+                  title = r$title,
+                  fluidPage(
+                    fluidRow(
+                      column(
+                        6,
+                        h5("Ingredients"),
+                        tags$ul(lapply(scaled_ings, function(x) tags$li(x)))
+                      ),
+                      column(
+                        6,
+                        h5("Instructions"),
+                        tags$ol(lapply(r$instructions, function(s) {
+                          tags$li(s$instruction_text)
+                        }))
+                      )
+                    ),
+                    fluidRow(
+                      column(
+                        6,
+                        numericInput(
+                          inputId = scale_input_id,
+                          label = "Scale servings (multiplier)",
+                          value = mult,
+                          min = 0.25,
+                          step = 0.25
+                        )
+                      ),
+                      column(
+                        6,
+                        actionButton(
+                          inputId = paste0("addshop_", id_now),
+                          label = "Add missing to shopping list",
+                          class = "btn-success"
+                        )
+                      )
+                    )
+                  ),
+                  easyClose = TRUE,
+                  footer = modalButton("Close")
+                )
+                removeModal()
+                showModal(modal2)
+              },
+              ignoreInit = TRUE
+            )
+          },
+          ignoreInit = TRUE
+        )
         # Edit observer: open edit modal
-        observeEvent(input[[editbtn]], {
-          r <- rv$recipes[[id_now]]
-          if (is.null(r)) return()
-          ing_text <- paste(sapply(r$ingredients, function(i) if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name), collapse = "\n")
-          inst_text <- paste(sapply(r$instructions, function(s) s$instruction_text), collapse = "\n")
-          edit_modal <- modalDialog(
-            title = paste0("Edit: ", r$title),
-            textInput("edit_title", "Title", value = r$title),
-            textAreaInput("edit_ingredients", "Ingredients (one per line)", value = ing_text, rows = 8),
-            textAreaInput("edit_instructions", "Instructions (one per line)", value = inst_text, rows = 8),
-            footer = tagList(modalButton("Cancel"), actionButton("save_edit", "Save", class = "btn-primary"))
-          )
-          showModal(edit_modal)
-          # handle save_edit for this modal
-          observeEvent(input$save_edit, {
-            # build updated recipe
-            new_title <- input$edit_title
-            new_ings <- parse_ingredients_raw(input$edit_ingredients)
-            inst_lines <- unlist(strsplit(as.character(input$edit_instructions), "[\\r\\n]+"))
-            inst_lines <- trimws(inst_lines)
-            inst_lines <- inst_lines[inst_lines != ""]
-            updated <- r
-            updated$title <- new_title
-            updated$ingredients <- new_ings
-            updated$instructions <- lapply(seq_along(inst_lines), function(i) list(step_number = i, instruction_text = inst_lines[i]))
-            update_recipe(id_now, updated)
-            showNotification(sprintf("Updated '%s'", new_title), type = "message")
-            refresh_data()
-            removeModal()
-          }, once = TRUE)
-        }, ignoreInit = TRUE)
+        observeEvent(
+          input[[editbtn]],
+          {
+            r <- rv$recipes[[id_now]]
+            if (is.null(r)) {
+              return()
+            }
+            ing_text <- paste(
+              sapply(r$ingredients, function(i) {
+                if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name
+              }),
+              collapse = "\n"
+            )
+            inst_text <- paste(
+              sapply(r$instructions, function(s) s$instruction_text),
+              collapse = "\n"
+            )
+            edit_modal <- modalDialog(
+              title = paste0("Edit: ", r$title),
+              textInput("edit_title", "Title", value = r$title),
+              textAreaInput(
+                "edit_ingredients",
+                "Ingredients (one per line)",
+                value = ing_text,
+                rows = 8
+              ),
+              textAreaInput(
+                "edit_instructions",
+                "Instructions (one per line)",
+                value = inst_text,
+                rows = 8
+              ),
+              footer = tagList(
+                modalButton("Cancel"),
+                actionButton("save_edit", "Save", class = "btn-primary")
+              )
+            )
+            showModal(edit_modal)
+            # handle save_edit for this modal
+            observeEvent(
+              input$save_edit,
+              {
+                # build updated recipe
+                new_title <- input$edit_title
+                new_ings <- parse_ingredients_raw(input$edit_ingredients)
+                inst_lines <- unlist(strsplit(
+                  as.character(input$edit_instructions),
+                  "[\\r\\n]+"
+                ))
+                inst_lines <- trimws(inst_lines)
+                inst_lines <- inst_lines[inst_lines != ""]
+                updated <- r
+                updated$title <- new_title
+                updated$ingredients <- new_ings
+                updated$instructions <- lapply(
+                  seq_along(inst_lines),
+                  function(i) {
+                    list(step_number = i, instruction_text = inst_lines[i])
+                  }
+                )
+                update_recipe(id_now, updated)
+                showNotification(
+                  sprintf("Updated '%s'", new_title),
+                  type = "message"
+                )
+                refresh_data()
+                removeModal()
+              },
+              once = TRUE
+            )
+          },
+          ignoreInit = TRUE
+        )
 
         # Delete observer: confirm then delete
-        observeEvent(input[[delbtn]], {
-          r <- rv$recipes[[id_now]]
-          if (is.null(r)) return()
-          confirm <- modalDialog(title = paste0("Delete: ", r$title), p("Are you sure you want to delete this recipe?"), footer = tagList(modalButton("Cancel"), actionButton("confirm_delete", "Delete", class = "btn-danger")))
-          showModal(confirm)
-          observeEvent(input$confirm_delete, {
-            delete_recipe(id_now)
-            showNotification(sprintf("Deleted '%s'", r$title), type = "message")
-            refresh_data()
-            removeModal()
-          }, once = TRUE)
-        }, ignoreInit = TRUE)
+        observeEvent(
+          input[[delbtn]],
+          {
+            r <- rv$recipes[[id_now]]
+            if (is.null(r)) {
+              return()
+            }
+            confirm <- modalDialog(
+              title = paste0("Delete: ", r$title),
+              p("Are you sure you want to delete this recipe?"),
+              footer = tagList(
+                modalButton("Cancel"),
+                actionButton("confirm_delete", "Delete", class = "btn-danger")
+              )
+            )
+            showModal(confirm)
+            observeEvent(
+              input$confirm_delete,
+              {
+                delete_recipe(id_now)
+                showNotification(
+                  sprintf("Deleted '%s'", r$title),
+                  type = "message"
+                )
+                refresh_data()
+                removeModal()
+              },
+              once = TRUE
+            )
+          },
+          ignoreInit = TRUE
+        )
       })
     })
   })
@@ -551,23 +826,38 @@ app_server <- function(input, output, session) {
   # Ingredients table
   output$ingredients_table <- DT::renderDataTable({
     ings <- rv$ingredients
-    if (length(ings) == 0) return(DT::datatable(data.frame()))
-    df <- do.call(rbind, lapply(ings, function(i) {
-      data.frame(id = i$id, name = i$ingredient_name, qty = i$quantity_available, unit = ifelse(is.null(i$unit), "", i$unit), stringsAsFactors = FALSE)
-    }))
+    if (length(ings) == 0) {
+      return(DT::datatable(data.frame()))
+    }
+    df <- do.call(
+      rbind,
+      lapply(ings, function(i) {
+        data.frame(
+          id = i$id,
+          name = i$ingredient_name,
+          qty = i$quantity_available,
+          unit = ifelse(is.null(i$unit), "", i$unit),
+          stringsAsFactors = FALSE
+        )
+      })
+    )
     DT::datatable(df, rownames = FALSE)
   })
 
   # Export handlers
   output$export_json <- downloadHandler(
-    filename = function() paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".json"),
+    filename = function() {
+      paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".json")
+    },
     content = function(file) {
       export_recipes_json(file)
     }
   )
 
   output$export_csv <- downloadHandler(
-    filename = function() paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".csv"),
+    filename = function() {
+      paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".csv")
+    },
     content = function(file) {
       export_recipes_csv(file)
     }
@@ -582,30 +872,38 @@ app_server <- function(input, output, session) {
     }
     path <- f$datapath
     ext <- tools::file_ext(f$name)
-    tryCatch({
-      if (tolower(ext) == "json") {
-        import_recipes_json(path)
-      } else if (tolower(ext) %in% c("csv")) {
-        import_recipes_csv(path)
-      } else {
-        stop("Unsupported file type")
+    tryCatch(
+      {
+        if (tolower(ext) == "json") {
+          import_recipes_json(path)
+        } else if (tolower(ext) %in% c("csv")) {
+          import_recipes_csv(path)
+        } else {
+          stop("Unsupported file type")
+        }
+        showNotification("Import completed", type = "message")
+        refresh_data()
+      },
+      error = function(e) {
+        showNotification(paste("Import failed:", e$message), type = "error")
       }
-      showNotification("Import completed", type = "message")
-      refresh_data()
-    }, error = function(e) {
-      showNotification(paste("Import failed:", e$message), type = "error")
-    })
+    )
   })
 
   # Backup and restore
   observeEvent(input$backup_btn, {
-    tryCatch({
-      dest <- backup_db()
-      showNotification(paste("Backup created:", dest), type = "message")
-      # update restore choices
-      choices <- list_backups()
-      updateSelectInput(session, "restore_choice", choices = choices)
-    }, error = function(e) showNotification(paste("Backup failed:", e$message), type = "error"))
+    tryCatch(
+      {
+        dest <- backup_db()
+        showNotification(paste("Backup created:", dest), type = "message")
+        # update restore choices
+        choices <- list_backups()
+        updateSelectInput(session, "restore_choice", choices = choices)
+      },
+      error = function(e) {
+        showNotification(paste("Backup failed:", e$message), type = "error")
+      }
+    )
   })
 
   observeEvent(input$restore_btn, {
@@ -614,11 +912,16 @@ app_server <- function(input, output, session) {
       showNotification("No backup selected", type = "error")
       return()
     }
-    tryCatch({
-      restore_backup(choice)
-      showNotification("Restore completed. Reloading data.", type = "message")
-      refresh_data()
-    }, error = function(e) showNotification(paste("Restore failed:", e$message), type = "error"))
+    tryCatch(
+      {
+        restore_backup(choice)
+        showNotification("Restore completed. Reloading data.", type = "message")
+        refresh_data()
+      },
+      error = function(e) {
+        showNotification(paste("Restore failed:", e$message), type = "error")
+      }
+    )
   })
 
   # On start, populate backup choices
@@ -648,46 +951,80 @@ app_server <- function(input, output, session) {
       savebtn <- paste0("save_scaled_", rid)
       local({
         id_now <- rid
-        observeEvent(input[[savebtn]], {
-          r <- rv$recipes[[id_now]]
-          if (is.null(r)) return()
-          scale_input_id <- paste0("scale_", id_now)
-          mult <- as.numeric(input[[scale_input_id]])
-          if (is.null(mult) || is.na(mult)) mult <- 1
-          prefs <- get_prefs()
-          sys <- if (!is.null(prefs$unit_system)) prefs$unit_system else "american"
-          # build scaled ingredients
-          scaled_ings <- lapply(r$ingredients, function(i) {
-            # keep original values and add scaled values
-            orig_qty <- if (!is.null(i$quantity)) i$quantity else NA_real_
-            orig_unit <- if (!is.null(i$unit)) i$unit else NA_character_
-            if (!is.na(orig_qty)) {
-              new_qty <- as.numeric(orig_qty) * mult
-              # attempt density-based conversion using ingredient name
-              conv <- convert_with_density(new_qty, orig_unit, target_system = sys, ingredient_name = i$ingredient_name)
-              scaled_qty <- conv$quantity
-              scaled_unit <- conv$unit
-              scaled_display <- conv$display
-            } else {
-              scaled_qty <- NA_real_
-              scaled_unit <- orig_unit
-              scaled_display <- i$raw_text
+        observeEvent(
+          input[[savebtn]],
+          {
+            r <- rv$recipes[[id_now]]
+            if (is.null(r)) {
+              return()
             }
-            list(
-              ingredient_name = i$ingredient_name,
-              orig_quantity = orig_qty,
-              orig_unit = orig_unit,
-              scaled_quantity = scaled_qty,
-              scaled_unit = scaled_unit,
-              raw_text = if (!is.null(scaled_display) && !is.na(scaled_display)) scaled_display else i$raw_text
+            scale_input_id <- paste0("scale_", id_now)
+            mult <- as.numeric(input[[scale_input_id]])
+            if (is.null(mult) || is.na(mult)) {
+              mult <- 1
+            }
+            prefs <- get_prefs()
+            sys <- if (!is.null(prefs$unit_system)) {
+              prefs$unit_system
+            } else {
+              "american"
+            }
+            # build scaled ingredients
+            scaled_ings <- lapply(r$ingredients, function(i) {
+              # keep original values and add scaled values
+              orig_qty <- if (!is.null(i$quantity)) i$quantity else NA_real_
+              orig_unit <- if (!is.null(i$unit)) i$unit else NA_character_
+              if (!is.na(orig_qty)) {
+                new_qty <- as.numeric(orig_qty) * mult
+                # attempt density-based conversion using ingredient name
+                conv <- convert_with_density(
+                  new_qty,
+                  orig_unit,
+                  target_system = sys,
+                  ingredient_name = i$ingredient_name
+                )
+                scaled_qty <- conv$quantity
+                scaled_unit <- conv$unit
+                scaled_display <- conv$display
+              } else {
+                scaled_qty <- NA_real_
+                scaled_unit <- orig_unit
+                scaled_display <- i$raw_text
+              }
+              list(
+                ingredient_name = i$ingredient_name,
+                orig_quantity = orig_qty,
+                orig_unit = orig_unit,
+                scaled_quantity = scaled_qty,
+                scaled_unit = scaled_unit,
+                raw_text = if (
+                  !is.null(scaled_display) && !is.na(scaled_display)
+                ) {
+                  scaled_display
+                } else {
+                  i$raw_text
+                }
+              )
+            })
+            # scaled instructions same as original
+            scaled_recipe <- list(
+              title = paste0(r$title, " (scaled x", mult, ")"),
+              source = "manual",
+              source_url = NULL,
+              ingredients = scaled_ings,
+              instructions = r$instructions,
+              date_added = Sys.time(),
+              last_modified = Sys.time()
             )
-          })
-          # scaled instructions same as original
-          scaled_recipe <- list(title = paste0(r$title, " (scaled x", mult, ")"), source = "manual", source_url = NULL, ingredients = scaled_ings, instructions = r$instructions, date_added = Sys.time(), last_modified = Sys.time())
-          add_recipe(scaled_recipe)
-          showNotification(sprintf("Saved scaled recipe '%s'", scaled_recipe$title), type = "message")
-          refresh_data()
-        }, ignoreInit = TRUE)
+            add_recipe(scaled_recipe)
+            showNotification(
+              sprintf("Saved scaled recipe '%s'", scaled_recipe$title),
+              type = "message"
+            )
+            refresh_data()
+          },
+          ignoreInit = TRUE
+        )
       })
     })
   })
@@ -695,7 +1032,11 @@ app_server <- function(input, output, session) {
   # Densities: render table with all built-in and custom densities
   output$densities_table <- DT::renderDataTable({
     all_densities <- list_all_densities()
-    DT::datatable(all_densities, rownames = FALSE, options = list(pageLength = 10))
+    DT::datatable(
+      all_densities,
+      rownames = FALSE,
+      options = list(pageLength = 10)
+    )
   })
 
   # Densities: add custom density handler
@@ -709,17 +1050,22 @@ app_server <- function(input, output, session) {
       return()
     }
     if (is.null(ing_value) || is.na(ing_value) || ing_value <= 0) {
-      showNotification("Please enter a valid density value (must be > 0)", type = "error")
+      showNotification(
+        "Please enter a valid density value (must be > 0)",
+        type = "error"
+      )
       return()
     }
 
     # Add custom density
     add_custom_density(ing_name, ing_value)
-    showNotification(sprintf("Added custom density: %s = %.2f g/ml", ing_name, ing_value), type = "message")
+    showNotification(
+      sprintf("Added custom density: %s = %.2f g/ml", ing_name, ing_value),
+      type = "message"
+    )
 
     # Clear input fields
     updateTextInput(session, "new_density_ingredient", value = "")
     updateNumericInput(session, "new_density_value", value = 1.0)
   })
-
 }

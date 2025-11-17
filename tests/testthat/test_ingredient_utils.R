@@ -5,12 +5,12 @@ test_that('parse_fraction handles mixed numbers and fractions', {
   expect_equal(parse_fraction('1 1/2'), 1.5)
   expect_equal(parse_fraction('1/2'), 0.5)
   expect_equal(parse_fraction('2'), 2)
-  expect_equal(round(parse_fraction('1.25'),2), 1.25)
+  expect_equal(round(parse_fraction('1.25'), 2), 1.25)
 })
 
 test_that('parse_ingredient_line extracts quantity unit and name', {
   p <- parse_ingredient_line('1 1/2 cups flour')
-  expect_equal(round(p$quantity,2), 1.5)
+  expect_equal(round(p$quantity, 2), 1.5)
   expect_true(grepl('flour', p$name))
   expect_true(!is.na(p$unit))
 })
