@@ -5,6 +5,7 @@ ui_modern <- function() {
     fluidPage(
       # Custom modern CSS styling
       tags$head(
+        shinyjs::useShinyjs(),
         tags$meta(charset = "utf-8"),
         tags$meta(name = "viewport", content = "width=device-width, initial-scale=1"),
         tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"),
@@ -528,8 +529,8 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    h5(tags$i(class = "fas fa-search icon-primary"), "Smart Matching"),
-                    p("Find recipes based on your available ingredients with intelligent matching algorithm")
+                    h5(icon("search", class = "icon-primary"), "Browse Recipes"),
+                    p("Search and filter through a curated collection of recipes with advanced filtering options")
                   )
                 )
               ),
@@ -539,8 +540,8 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    h5(tags$i(class = "fas fa-expand-alt icon-secondary"), "Recipe Scaling"),
-                    p("Scale recipes up or down with automatic unit conversions and density-based conversions")
+                    h5(icon("plus-circle", class = "icon-secondary"), "Add Recipes"),
+                    p("Add new recipes from external sources to build your personal recipe collection")
                   )
                 )
               ),
@@ -550,8 +551,8 @@ ui_modern <- function() {
                   class = "card",
                   div(
                     class = "card-body",
-                    h5(tags$i(class = "fas fa-list-check icon-success"), "Shopping Lists"),
-                    p("Create consolidated shopping lists from recipes you want to make")
+                    h5(icon("gear", class = "icon-success"), "Manage Settings"),
+                    p("Configure preferences, manage ingredient densities, and import/export your recipes")
                   )
                 )
               )
@@ -567,37 +568,90 @@ ui_modern <- function() {
             div(
               class = "section-header",
               h1(class = "section-title", "Browse Recipes"),
-              p(class = "section-subtitle", "Explore recipes with ingredient matching")
+              p(class = "section-subtitle", "Search and filter through your recipe collection")
             ),
 
-            # Search and filters
+            # Search
             div(
               class = "row mb-3",
               div(
-                class = "col-md-6",
+                class = "col-md-12",
                 div(
                   class = "input-group",
-                  textInput("search_query", NULL, placeholder = "Search recipes...", width = "100%"),
-                  tags$span(class = "input-group-text", tags$i(class = "fas fa-search"))
+                  textInput("search_query", NULL, placeholder = "Search recipes by title...", width = "100%"),
+                  tags$span(class = "input-group-text", icon("search"))
+                )
+              )
+            ),
+
+            # Advanced Filters (collapsible)
+            div(
+              class = "card mb-4",
+              div(
+                class = "card-header",
+                div(
+                  style = "display: flex; justify-content: space-between; align-items: center;",
+                  h5(style = "margin: 0;", icon("filter"), "Advanced Filters"),
+                  actionButton("toggle_filters", "Show/Hide", class = "btn btn-sm btn-secondary")
                 )
               ),
               div(
-                class = "col-md-6",
-                selectInput("cuisine_filter", "Filter by Cuisine", choices = c("All" = "", "Chinese" = "Chinese Cuisine", "Thai" = "Thai Cuisine", "Japanese" = "Japanese Cuisine", "Indian" = "Indian Cuisine", "Vietnamese" = "Vietnamese Cuisine"), width = "100%")
+                id = "filter_panel",
+                class = "card-body",
+                style = "display: none;",
+                div(
+                  class = "row mb-3",
+                  div(
+                    class = "col-md-6",
+                    h6("By Cuisine"),
+                    shinyWidgets::pickerInput(
+                      "cuisine_filter",
+                      NULL,
+                      choices = c("Chinese Cuisine", "Thai Cuisine", "Japanese Cuisine", "Indian Cuisine", "Vietnamese Cuisine"),
+                      selected = NULL,
+                      multiple = TRUE,
+                      options = list(
+                        `actions-box` = TRUE,
+                        `selected-text-format` = "count > 2"
+                      )
+                    )
+                  ),
+                  div(
+                    class = "col-md-6",
+                    h6("By Source URL"),
+                    shinyWidgets::pickerInput(
+                      "source_filter",
+                      NULL,
+                      choices = c(),
+                      selected = NULL,
+                      multiple = TRUE,
+                      options = list(
+                        `actions-box` = TRUE,
+                        `selected-text-format` = "count > 2"
+                      )
+                    )
+                  )
+                ),
+                div(
+                  class = "row",
+                  div(
+                    class = "col-md-12",
+                    actionButton("reset_filters", "Reset All Filters", class = "btn btn-warning btn-sm"),
+                    actionButton("select_all_filters", "Select All", class = "btn btn-info btn-sm ms-2")
+                  )
+                )
               )
             ),
 
-            # Match threshold
+            # Recipes table display
             div(
-              class = "row mb-3",
+              class = "card mt-4",
               div(
-                class = "col-md-6",
-                sliderInput("match_threshold", "Minimum Match %", min = 0, max = 100, value = 0, width = "100%")
+                class = "card-body",
+                h5("Recipe Collection"),
+                DT::dataTableOutput("recipes_table_display")
               )
-            ),
-
-            # Recipes display
-            uiOutput("recipes_cards_modern")
+            )
           )
         ),
 
@@ -687,33 +741,6 @@ ui_modern <- function() {
               div(
                 class = "col-lg-10 mx-auto",
                 DT::dataTableOutput("ingredients_table")
-              )
-            )
-          )
-        ),
-
-        # Shopping List Tab
-        tabPanel(
-          "Shopping List",
-          div(
-            class = "container-main",
-            div(
-              class = "section-header",
-              h1(class = "section-title", "Shopping List"),
-              p(class = "section-subtitle", "Items you need to shop for")
-            ),
-
-            div(
-              class = "row",
-              div(
-                class = "col-lg-8 mx-auto",
-                div(
-                  class = "card",
-                  div(
-                    class = "card-body",
-                    verbatimTextOutput("shopping_list")
-                  )
-                )
               )
             )
           )

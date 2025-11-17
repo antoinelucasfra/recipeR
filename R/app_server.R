@@ -7,14 +7,12 @@
 app_server <- function(input, output, session) {
   rv <- reactiveValues(
     recipes = list(),
-    ingredients = list(),
-    shopping = character()
+    ingredients = list()
   )
 
   refresh_data <- function() {
     rv$recipes <- get_recipes()
     rv$ingredients <- get_ingredients()
-    rv$shopping <- get_shopping_list()
   }
 
   refresh_data()
@@ -38,95 +36,85 @@ app_server <- function(input, output, session) {
     round(mean(sapply(rv$recipes, function(r) length(r$ingredients))), 1)
   })
 
-  # Matching: simple name-based matching
-  calc_match <- function(recipe, inventory) {
-    if (is.null(recipe$ingredients) || length(recipe$ingredients) == 0) return(0)
-    inv_names <- tolower(sapply(inventory, function(x) if (!is.null(x$ingredient_name)) x$ingredient_name else ""))
-    req_names <- tolower(sapply(recipe$ingredients, function(i) if (!is.null(i$ingredient_name)) i$ingredient_name else ""))
-    matched <- sum(sapply(req_names, function(r) any(grepl(r, inv_names, fixed = TRUE))))
-    round(100 * matched / length(req_names))
-  }
+  # Toggle Advanced Filters Panel
+  observeEvent(input$toggle_filters, {
+    shinyjs::toggleClass("filter_panel", "show")
+  })
 
-  # Render modern recipe cards with filtering
-  output$recipes_cards_modern <- renderUI({
+  # Reset All Filters
+  observeEvent(input$reset_filters, {
+    shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = NULL)
+    shinyWidgets::updatePickerInput(session, "source_filter", selected = NULL)
+    updateTextInput(session, "search_query", value = "")
+    showNotification("Filters reset", type = "message")
+  })
+
+  # Select All Filters
+  observeEvent(input$select_all_filters, {
+    all_cuisines <- c("Chinese Cuisine", "Thai Cuisine", "Japanese Cuisine", "Indian Cuisine", "Vietnamese Cuisine")
+    shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = all_cuisines)
+    showNotification("All cuisines selected", type = "message")
+  })
+
+  # Update source_filter choices dynamically
+  observeEvent(rv$recipes, {
+    sources <- unique(sapply(rv$recipes, function(r) r$source_url %||% ""))
+    sources <- sources[sources != ""]
+    shinyWidgets::updatePickerInput(session, "source_filter", choices = sources)
+  })
+
+  # Render DT table with filtering
+  output$recipes_table_display <- DT::renderDataTable({
     recs <- rv$recipes
-    inv <- rv$ingredients
 
-    # Apply filters
+    # Apply search filter
     if (!is.null(input$search_query) && input$search_query != "") {
       search_lower <- tolower(input$search_query)
       recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
     }
 
-    if (!is.null(input$cuisine_filter) && input$cuisine_filter != "") {
-      recs <- Filter(function(r) r$source == input$cuisine_filter, recs)
+    # Apply cuisine filter
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
     }
 
-    threshold <- input$match_threshold %||% 0
-    recs <- Filter(function(r) calc_match(r, inv) >= threshold, recs)
+    # Apply source filter
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
 
+    # Build display dataframe
     if (length(recs) == 0) {
-      return(tags$div(
-        class = "alert alert-info",
-        tags$i(class = "fas fa-search"), " No recipes match your criteria"
-      ))
+      df <- data.frame(Title = character(), Cuisine = character(), Ingredients = integer(), Steps = integer(), Added = character())
+      return(DT::datatable(df))
     }
 
-    cards <- lapply(recs, function(r) {
-      pct <- calc_match(r, inv)
-      match_class <- if (pct >= 75) "match-high" else if (pct >= 50) "match-medium" else "match-low"
+    df <- do.call(rbind, lapply(recs, function(r) {
+      data.frame(
+        Title = r$title,
+        Cuisine = r$source,
+        Ingredients = length(r$ingredients),
+        Steps = length(r$instructions),
+        Added = format(r$date_added, "%Y-%m-%d"),
+        stringsAsFactors = FALSE
+      )
+    }))
 
-      tags$div(
-        class = "recipe-card",
-        div(
-          class = "recipe-card-title",
-          tags$i(class = "fas fa-bowl-food", style = "color: var(--primary); margin-right: 0.5rem;"),
-          r$title
-        ),
-        div(
-          class = "recipe-card-meta",
-          tags$span(
-            class = "recipe-meta-item",
-            tags$i(class = "fas fa-globe"),
-            r$source
-          ),
-          tags$span(
-            class = "recipe-meta-item",
-            tags$i(class = "fas fa-carrot"),
-            sprintf("%d ingredients", length(r$ingredients))
-          ),
-          tags$span(
-            class = "recipe-meta-item",
-            tags$i(class = "fas fa-list-check"),
-            sprintf("%d steps", length(r$instructions))
-          )
-        ),
-        div(
-          class = "mb-3",
-          tags$span(class = paste("match-badge", match_class), sprintf("Match: %d%%", pct))
-        ),
-        div(
-          class = "btn-group btn-group-sm",
-          actionButton(
-            paste0("view_", r$recipe_id),
-            tags$i(class = "fas fa-eye"), " View",
-            class = "btn btn-primary btn-sm"
-          ),
-          actionButton(
-            paste0("edit_", r$recipe_id),
-            tags$i(class = "fas fa-edit"), " Edit",
-            class = "btn btn-info btn-sm"
-          ),
-          actionButton(
-            paste0("del_", r$recipe_id),
-            tags$i(class = "fas fa-trash"), " Delete",
-            class = "btn btn-danger btn-sm"
-          )
+    DT::datatable(
+      df,
+      rownames = FALSE,
+      options = list(
+        pageLength = 10,
+        autoWidth = TRUE,
+        columnDefs = list(
+          list(width = "35%", targets = 0),
+          list(width = "15%", targets = 1),
+          list(width = "10%", targets = 2),
+          list(width = "10%", targets = 3),
+          list(width = "15%", targets = 4)
         )
       )
-    })
-
-    do.call(tagList, cards)
+    )
   })
 
   # Simple ingredient parser: one-per-line -> ingredient_name = line trimmed
@@ -298,25 +286,6 @@ app_server <- function(input, output, session) {
             removeModal()
           }, once = TRUE)
         }, ignoreInit = TRUE)
-        # observer for add-to-shopping button
-        addbtn <- paste0("addshop_", rid)
-        observeEvent(input[[addbtn]], {
-          r <- rv$recipes[[rid]]
-          if (is.null(r)) return()
-          inv <- rv$ingredients
-          inv_names <- tolower(sapply(inv, function(x) if (!is.null(x$ingredient_name)) x$ingredient_name else ""))
-          req_names <- sapply(r$ingredients, function(i) i$ingredient_name)
-          missing <- req_names[!sapply(tolower(req_names), function(rr) any(grepl(rr, inv_names, fixed = TRUE)))]
-          if (length(missing) == 0) {
-            showNotification("No missing ingredients to add.", type = "message")
-            return()
-          }
-          # combine into shopping list (append) and persist
-          rv$shopping <- unique(c(rv$shopping, missing))
-          save_shopping_list(rv$shopping)
-          showNotification(sprintf("Added %d items to shopping list", length(missing)), type = "message")
-          removeModal()
-        }, ignoreInit = TRUE)
       })
     })
   })
@@ -329,10 +298,6 @@ app_server <- function(input, output, session) {
       data.frame(id = i$id, name = i$ingredient_name, qty = i$quantity_available, unit = ifelse(is.null(i$unit), "", i$unit), stringsAsFactors = FALSE)
     }))
     DT::datatable(df, rownames = FALSE)
-  })
-
-  output$shopping_list <- renderPrint({
-    if (length(rv$shopping) == 0) cat("Shopping list is empty\n") else cat(paste(rv$shopping, collapse = "\n"))
   })
 
   # Export handlers
