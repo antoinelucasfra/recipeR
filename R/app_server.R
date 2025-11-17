@@ -10,6 +10,9 @@ app_server <- function(input, output, session) {
     ingredients = list()
   )
 
+  # Reactive variable for selected recipe detail
+  selected_recipe <- NULL
+
   refresh_data <- function() {
     rv$recipes <- get_recipes()
     rv$ingredients <- get_ingredients()
@@ -114,6 +117,173 @@ app_server <- function(input, output, session) {
           list(width = "15%", targets = 4)
         )
       )
+    )
+  })
+
+  # Browse page stats - calculate from filtered data
+  output$browse_total_recipes <- renderText({
+    recs <- rv$recipes
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+    }
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
+    length(recs)
+  })
+
+  output$browse_avg_ingredients <- renderText({
+    recs <- rv$recipes
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+    }
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
+    if (length(recs) == 0) return("0")
+    round(mean(sapply(recs, function(r) length(r$ingredients))), 1)
+  })
+
+  output$browse_avg_steps <- renderText({
+    recs <- rv$recipes
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+    }
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
+    if (length(recs) == 0) return("0")
+    round(mean(sapply(recs, function(r) length(r$instructions))), 1)
+  })
+
+  output$browse_cuisines_count <- renderText({
+    recs <- rv$recipes
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+    }
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
+    if (length(recs) == 0) return("0")
+    length(unique(sapply(recs, function(r) r$source)))
+  })
+
+  # Recipe detail modal - show selected recipe
+  observeEvent(input$recipes_table_display_rows_selected, {
+    if (is.null(input$recipes_table_display_rows_selected)) return()
+    row_idx <- input$recipes_table_display_rows_selected
+    recs <- rv$recipes
+    
+    # Apply same filters as table
+    if (!is.null(input$search_query) && input$search_query != "") {
+      search_lower <- tolower(input$search_query)
+      recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+    }
+    if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+      recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+    }
+    if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+      recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+    }
+    
+    recs_list <- recs[names(recs)]
+    if (row_idx > 0 && row_idx <= length(recs_list)) {
+      selected_recipe <<- recs_list[[row_idx]]
+      # Show modal using shinyjs
+      shinyjs::runjs("$('#recipe_detail_modal').modal('show');")
+    }
+  })
+
+  # Render recipe detail content
+  output$recipe_detail_content <- renderUI({
+    if (is.null(selected_recipe)) return(tags$p("No recipe selected"))
+    
+    r <- selected_recipe
+    
+    # Build ingredients list
+    ingredients_html <- lapply(r$ingredients, function(i) {
+      tags$div(
+        class = "ingredient-item",
+        icon("check-circle", style = "color: var(--success); margin-right: 0.5rem;"),
+        strong(i$ingredient_name),
+        if (!is.null(i$raw_text)) paste0(" (", i$raw_text, ")")
+      )
+    })
+    
+    # Build instructions list
+    instructions_html <- lapply(seq_along(r$instructions), function(idx) {
+      instr <- r$instructions[[idx]]
+      tags$div(
+        class = "step-item",
+        span(class = "step-number", idx),
+        instr$instruction_text
+      )
+    })
+    
+    list(
+      # Recipe metadata
+      tags$div(
+        class = "recipe-metadata",
+        tags$div(
+          class = "recipe-metadata-item",
+          tags$div(class = "label", "Cuisine"),
+          tags$div(class = "value", r$source)
+        ),
+        tags$div(
+          class = "recipe-metadata-item",
+          tags$div(class = "label", "Ingredients"),
+          tags$div(class = "value", length(r$ingredients))
+        ),
+        tags$div(
+          class = "recipe-metadata-item",
+          tags$div(class = "label", "Steps"),
+          tags$div(class = "value", length(r$instructions))
+        ),
+        tags$div(
+          class = "recipe-metadata-item",
+          tags$div(class = "label", "Added"),
+          tags$div(class = "value", format(r$date_added, "%b %d"))
+        )
+      ),
+      
+      # Ingredients section
+      tags$div(
+        class = "detail-section",
+        tags$h6(icon("carrot"), "Ingredients"),
+        tags$div(ingredients_html)
+      ),
+      
+      # Instructions section
+      tags$div(
+        class = "detail-section",
+        tags$h6(icon("list-check"), "Instructions"),
+        tags$div(instructions_html)
+      ),
+      
+      # Source URL if available
+      if (!is.null(r$source_url) && r$source_url != "") {
+        tags$div(
+          class = "detail-section",
+          tags$h6(icon("link"), "Source"),
+          tags$a(href = r$source_url, target = "_blank", r$source_url, class = "btn btn-sm btn-outline-primary")
+        )
+      }
     )
   })
 

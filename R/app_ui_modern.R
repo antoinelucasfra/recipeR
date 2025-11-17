@@ -439,6 +439,98 @@ ui_modern <- function() {
             color: white !important;
           }
 
+          /* Enhanced table styling */
+          .dataTables_wrapper .dataTable tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .dataTables_wrapper .dataTable tbody tr:hover {
+            background: linear-gradient(90deg, rgba(99,102,241,0.03), rgba(236,72,153,0.03));
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(99,102,241,0.05);
+          }
+
+          .dataTables_wrapper .dataTable tbody td {
+            padding: 12px 15px;
+            vertical-align: middle;
+          }
+
+          /* Recipe detail modal styling */
+          .recipe-detail-modal .modal-body {
+            padding: 2rem;
+          }
+
+          .recipe-detail-modal .detail-section {
+            margin-bottom: 2rem;
+          }
+
+          .recipe-detail-modal .detail-section h6 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(99,102,241,0.2);
+          }
+
+          .recipe-detail-modal .ingredient-item {
+            padding: 0.5rem 0;
+            border-left: 3px solid var(--primary);
+            padding-left: 1rem;
+            font-size: 0.95rem;
+          }
+
+          .recipe-detail-modal .step-item {
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+          }
+
+          .recipe-detail-modal .step-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 700;
+            margin-right: 0.75rem;
+            font-size: 0.9rem;
+          }
+
+          .recipe-metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+          }
+
+          .recipe-metadata-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 3px solid var(--primary);
+          }
+
+          .recipe-metadata-item .label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+          }
+
+          .recipe-metadata-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+          }
+
           @media (max-width: 768px) {
             .container-main {
               padding: 1rem;
@@ -471,6 +563,50 @@ ui_modern <- function() {
         tags$div(class = "spinner-card",
           tags$i(class = "fas fa-spinner fa-pulse fa-2x", style = "color: var(--primary);"),
           tags$div(tags$strong("Working"), tags$div(style = "font-size:0.9rem;color:var(--muted);", "Please wait..."))
+        )
+      ),
+
+      # Recipe Detail Modal
+      tags$div(
+        id = "recipe_detail_modal",
+        class = "modal fade recipe-detail-modal",
+        tabindex = "-1",
+        role = "dialog",
+        tags$div(
+          class = "modal-dialog modal-lg",
+          role = "document",
+          tags$div(
+            class = "modal-content",
+            tags$div(
+              class = "modal-header",
+              tags$h5(class = "modal-title", id = "recipe_title", "Recipe Details"),
+              tags$button(
+                type = "button",
+                class = "btn-close",
+                `data-bs-dismiss` = "modal",
+                `aria-label` = "Close"
+              )
+            ),
+            tags$div(
+              class = "modal-body",
+              uiOutput("recipe_detail_content")
+            ),
+            tags$div(
+              class = "modal-footer",
+              tags$button(
+                type = "button",
+                class = "btn btn-secondary",
+                `data-bs-dismiss` = "modal",
+                "Close"
+              ),
+              tags$button(
+                id = "edit_recipe_btn",
+                type = "button",
+                class = "btn btn-primary",
+                icon("edit"), "Edit Recipe"
+              )
+            )
+          )
         )
       ),
 
@@ -643,13 +779,49 @@ ui_modern <- function() {
               )
             ),
 
-            # Recipes table display
+            # Browse Stats (filtered)
+            div(
+              class = "stats-grid",
+              div(
+                class = "stat-card",
+                div(class = "stat-value", textOutput("browse_total_recipes")),
+                div(class = "stat-label", "Recipes Found")
+              ),
+              div(
+                class = "stat-card",
+                div(class = "stat-value", textOutput("browse_avg_ingredients")),
+                div(class = "stat-label", "Avg Ingredients")
+              ),
+              div(
+                class = "stat-card",
+                div(class = "stat-value", textOutput("browse_avg_steps")),
+                div(class = "stat-label", "Avg Steps")
+              ),
+              div(
+                class = "stat-card",
+                div(class = "stat-value", textOutput("browse_cuisines_count")),
+                div(class = "stat-label", "Cuisines")
+              )
+            ),
+
+            # Recipes table display with enhanced styling
             div(
               class = "card mt-4",
               div(
+                class = "card-header",
+                h5(style = "margin: 0;", icon("table"), "Recipe Catalog")
+              ),
+              div(
                 class = "card-body",
-                h5("Recipe Collection"),
-                DT::dataTableOutput("recipes_table_display")
+                div(
+                  style = "overflow-x: auto;",
+                  DT::dataTableOutput("recipes_table_display")
+                ),
+                div(
+                  class = "mt-3",
+                  p(class = "text-muted small", 
+                    "Click on a recipe row to view details. Tip: Use the search and filters above to narrow down your search.")
+                )
               )
             )
           )
