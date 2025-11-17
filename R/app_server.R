@@ -105,6 +105,7 @@ app_server <- function(input, output, session) {
 
     DT::datatable(
       df,
+      selection = list(mode = "multiple", target = "row"),
       rownames = FALSE,
       options = list(
         pageLength = 10,
@@ -186,11 +187,48 @@ app_server <- function(input, output, session) {
 
   # Recipe detail modal - show selected recipe
   observeEvent(input$recipes_table_display_rows_selected, {
-    if (is.null(input$recipes_table_display_rows_selected)) return()
-    row_idx <- input$recipes_table_display_rows_selected
+    rows <- input$recipes_table_display_rows_selected
+    if (is.null(rows) || length(rows) == 0) return()
+
+    # only open detail modal when a single row is selected
+    if (length(rows) == 1) {
+      row_idx <- rows[[1]]
+      recs <- rv$recipes
+
+      # Apply same filters as table
+      if (!is.null(input$search_query) && input$search_query != "") {
+        search_lower <- tolower(input$search_query)
+        recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
+      }
+      if (!is.null(input$cuisine_filter) && length(input$cuisine_filter) > 0) {
+        recs <- Filter(function(r) r$source %in% input$cuisine_filter, recs)
+      }
+      if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
+        recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
+      }
+
+      recs_list <- recs[names(recs)]
+      if (row_idx > 0 && row_idx <= length(recs_list)) {
+        selected_recipe <<- recs_list[[row_idx]]
+        # Show modal using Bootstrap 5 API so data-bs-dismiss works
+        shinyjs::runjs(
+          "(function(){var el=document.getElementById('recipe_detail_modal'); if(el){var m=bootstrap.Modal.getInstance(el)||new bootstrap.Modal(el); m.show();}})();"
+        )
+      }
+    }
+    # if multiple rows selected, do nothing here; user can click Compare
+  })
+
+  # Compare selected recipes - requires exactly two selected rows
+  observeEvent(input$compare_selected, {
+    sel <- input$recipes_table_display_rows_selected
+    if (is.null(sel) || length(sel) != 2) {
+      showNotification("Please select exactly two recipes to compare.", type = "error")
+      return()
+    }
+
     recs <- rv$recipes
-    
-    # Apply same filters as table
+    # Apply same filters as table to determine visible order
     if (!is.null(input$search_query) && input$search_query != "") {
       search_lower <- tolower(input$search_query)
       recs <- Filter(function(r) grepl(search_lower, tolower(r$title)), recs)
@@ -201,13 +239,22 @@ app_server <- function(input, output, session) {
     if (!is.null(input$source_filter) && length(input$source_filter) > 0) {
       recs <- Filter(function(r) (r$source_url %||% "") %in% input$source_filter, recs)
     }
-    
+
     recs_list <- recs[names(recs)]
-    if (row_idx > 0 && row_idx <= length(recs_list)) {
-      selected_recipe <<- recs_list[[row_idx]]
-      # Show modal using shinyjs
-      shinyjs::runjs("$('#recipe_detail_modal').modal('show');")
+    # validate indices
+    if (any(sel < 1) || any(sel > length(recs_list))) {
+      showNotification("Selected rows are out of range after filtering.", type = "error")
+      return()
     }
+
+    # store selected pair in reactiveValues so the UI renderer can access
+    pair <- list(recs_list[[sel[1]]], recs_list[[sel[2]]])
+    rv$compare_pair <- pair
+
+    # show compare modal using Bootstrap 5 API so close buttons work
+    shinyjs::runjs(
+      "(function(){var el=document.getElementById('recipe_compare_modal'); if(el){var m=bootstrap.Modal.getInstance(el)||new bootstrap.Modal(el); m.show();}})();"
+    )
   })
 
   # Render recipe detail content
@@ -284,6 +331,47 @@ app_server <- function(input, output, session) {
           tags$a(href = r$source_url, target = "_blank", r$source_url, class = "btn btn-sm btn-outline-primary")
         )
       }
+    )
+  })
+
+  # Render side-by-side comparison content for two recipes
+  output$recipe_compare_content <- renderUI({
+    pair <- rv$compare_pair
+    if (is.null(pair) || length(pair) != 2) {
+      return(tags$p("No recipes selected for comparison."))
+    }
+
+    make_col <- function(r) {
+      # ingredients list
+      ings <- lapply(r$ingredients, function(i) tags$li(if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name))
+      # short instructions (first 6 steps)
+      inst <- lapply(seq_along(r$instructions), function(idx) {
+        txt <- r$instructions[[idx]]$instruction_text
+        tags$li(txt)
+      })
+
+      tags$div(
+        class = "col-md-6",
+        tags$div(class = "card",
+          tags$div(class = "card-body",
+            tags$h4(r$title, style = "color: var(--primary);"),
+            tags$div(class = "recipe-metadata",
+              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Cuisine"), tags$div(class = "value", r$source)),
+              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Ingredients"), tags$div(class = "value", length(r$ingredients))),
+              tags$div(class = "recipe-metadata-item", tags$div(class = "label", "Steps"), tags$div(class = "value", length(r$instructions)))
+            ),
+            tags$h6("Ingredients"),
+            tags$ul(ings, style = "max-height:220px; overflow:auto; padding-left:1rem;"),
+            tags$h6("Instructions"),
+            tags$ol(inst, style = "max-height:220px; overflow:auto; padding-left:1rem;")
+          )
+        )
+      )
+    }
+
+    fluidRow(
+      make_col(pair[[1]]),
+      make_col(pair[[2]])
     )
   })
 
