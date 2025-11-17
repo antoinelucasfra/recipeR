@@ -16,7 +16,8 @@ Imports:
     gt,
     jsonlite,
     shinyWidgets,
-    shinyjs
+    shinyjs,
+    pkgload
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
