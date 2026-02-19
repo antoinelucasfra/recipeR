@@ -3,6 +3,9 @@
 ui_modern <- function() {
   shinyUI(
     fluidPage(
+
+      theme = shinythemes::shinytheme("sandstone"),
+  
       # Custom modern CSS styling
       tags$head(
         shinyjs::useShinyjs(),

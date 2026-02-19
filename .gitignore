@@ -1,4 +1,26 @@
-.Rproj.user
+# R / RStudio
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+# renv (keep lockfile and activate script, ignore installed libraries)
+renv/library/
+renv/staging/
+renv/python/
+renv/cache/
+
+# R package build artifacts
 inst/doc
 /doc/
 /Meta/
+src/*.o
+src/*.so
+*.dll
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
