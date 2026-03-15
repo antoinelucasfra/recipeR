@@ -1,11 +1,11 @@
 Package: recipeR
 Title: Recipe Manager Shiny App
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     person("Antoine", "Lucas", , "antoine.lucas.fra@gmail.com", role = c("aut", "cre"))
 Description: A golem-based Shiny application for managing recipes and ingredients, with unit conversion, ingredient matching, and file-based persistence.
 License: MIT + file LICENSE
-Imports: 
+Imports:
     bslib,
     config,
     DT,
@@ -15,8 +15,9 @@ Imports:
     shinyjs,
     shinyWidgets,
     tools,
-    utils
-Suggests: 
+    utils,
+    pkgload
+Suggests:
     knitr,
     rmarkdown,
     testthat

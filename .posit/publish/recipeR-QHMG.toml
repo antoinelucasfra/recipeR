@@ -20,9 +20,8 @@ files = [
   '/NAMESPACE',
   '/.Rbuildignore',
   '/.gitignore',
-  '/.Rprofile',
   '/man',
-  '/renv'
+  '!/renv'
 ]
 title = 'recipeR'
 

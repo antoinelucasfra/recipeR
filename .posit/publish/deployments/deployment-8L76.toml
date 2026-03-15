@@ -11,11 +11,10 @@ id = '019cf241-8ca4-a3a1-4e99-3f72f755ecd2'
 dashboard_url = 'https://connect.posit.cloud/antoinelucasfra/content/019cf241-8ca4-a3a1-4e99-3f72f755ecd2'
 direct_url = 'https://019cf241-8ca4-a3a1-4e99-3f72f755ecd2.share.connect.posit.cloud'
 logs_url = 'https://connect.posit.cloud/antoinelucasfra/content/019cf241-8ca4-a3a1-4e99-3f72f755ecd2/history'
-deployed_at = '2026-03-15T17:11:51+01:00'
-bundle_id = '019cf244-978a-9c9b-585b-409006e7b821'
+deployed_at = '2026-03-15T18:01:55+01:00'
+bundle_id = '019cf272-7e0c-b7df-f12f-f9f07c1539ba'
 files = [
   '.Rbuildignore',
-  '.Rprofile',
   '.gitignore',
   '.posit/publish/deployments/deployment-8L76.toml',
   '.posit/publish/recipeR-QHMG.toml',
@@ -30,6 +29,13 @@ files = [
   'R/ingredient_module.R',
   'R/ingredient_utils.R',
   'R/matching_module.R',
+  'R/mod_add.R',
+  'R/mod_browse.R',
+  'R/mod_cooking.R',
+  'R/mod_home.R',
+  'R/mod_ingredients.R',
+  'R/mod_settings.R',
+  'R/mod_shopping.R',
   'R/recipe_module.R',
   'R/run_app.R',
   'README.md',
@@ -47,19 +53,11 @@ files = [
   'inst/app/www/favicon.ico',
   'inst/golem-config.yml',
   'man/run_app.Rd',
-  'renv.lock',
-  'renv/.gitignore',
-  'renv/activate.R',
-  'renv/settings.json'
+  'renv.lock'
 ]
 
 [connect_cloud]
 account_name = 'antoinelucasfra'
-
-[deployment_error]
-code = 'unknown'
-message = 'Runtime error: Unable to start the app due to a runtime error. Please check the logs for more information.'
-operation = 'publish/deployContent'
 
 [configuration]
 product_type = 'connect_cloud'
@@ -81,9 +79,8 @@ files = [
   '/NAMESPACE',
   '/.Rbuildignore',
   '/.gitignore',
-  '/.Rprofile',
   '/man',
-  '/renv'
+  '!/renv'
 ]
 title = 'recipeR'
 
@@ -246,6 +243,29 @@ needscompilation = 'yes'
 author = 'Winston Chang [aut, cre], Posit Software, PBC [cph, fnd]'
 'config/needs/website' = 'pkgdown'
 
+[renv.packages.callr]
+package = 'callr'
+version = '3.7.6'
+source = 'Repository'
+repository = 'RSPM'
+depends = ['R (>= 3.4)']
+hash = ''
+title = 'Call R from R'
+'authors@r' = 'c( person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-7098-9676")), person("Winston", "Chang", role = "aut"), person("Posit Software, PBC", role = c("cph", "fnd")), person("Ascent Digital Services", role = c("cph", "fnd")) )'
+maintainer = 'Gábor Csárdi <csardi.gabor@gmail.com>'
+description = 'It is sometimes useful to perform a computation in a separate R process, without affecting the current R process at all.  This packages does exactly that.'
+url = 'https://callr.r-lib.org, https://github.com/r-lib/callr'
+bugreports = 'https://github.com/r-lib/callr/issues'
+license = 'MIT + file LICENSE'
+imports = ['processx (>= 3.6.1)', 'R6', 'utils']
+suggests = ['asciicast (>= 2.3.1)', 'cli (>= 1.1.0)', 'mockery', 'ps', 'rprojroot', 'spelling', 'testthat (>= 3.2.0)', 'withr (>= 2.3.0)']
+roxygennote = '7.3.1.9000'
+encoding = 'UTF-8'
+needscompilation = 'no'
+author = 'Gábor Csárdi [aut, cre, cph] (<https://orcid.org/0000-0001-7098-9676>), Winston Chang [aut], Posit Software, PBC [cph, fnd], Ascent Digital Services [cph, fnd]'
+'config/testthat/edition' = '3'
+'config/needs/website' = 'r-lib/asciicast, glue, htmlwidgets, igraph, tibble, tidyverse/tidytemplate'
+
 [renv.packages.cli]
 package = 'cli'
 version = '3.6.5'
@@ -333,6 +353,29 @@ encoding = 'UTF-8'
 needscompilation = 'no'
 author = 'Joe Cheng [aut], Carson Sievert [aut, cre] (ORCID: <https://orcid.org/0000-0002-4958-2844>), Posit Software, PBC [cph, fnd], jQuery Foundation [cph] (jQuery library and jQuery UI library), jQuery contributors [ctb, cph] (jQuery library; authors listed in inst/www/shared/jquery-AUTHORS.txt), Mark Otto [ctb] (Bootstrap library), Jacob Thornton [ctb] (Bootstrap library), Bootstrap contributors [ctb] (Bootstrap library), Twitter, Inc [cph] (Bootstrap library), Brian Reavis [ctb, cph] (selectize.js library), Kristopher Michael Kowal [ctb, cph] (es5-shim library), es5-shim contributors [ctb, cph] (es5-shim library), Denis Ineshin [ctb, cph] (ion.rangeSlider library), Sami Samhuri [ctb, cph] (Javascript strftime library)'
 'config/needs/website' = 'jcheng5/d3scatter, DT, leaflet, rmarkdown'
+
+[renv.packages.desc]
+package = 'desc'
+version = '1.4.3'
+source = 'Repository'
+repository = 'RSPM'
+depends = ['R (>= 3.4)']
+hash = ''
+title = 'Manipulate DESCRIPTION Files'
+'authors@r' = 'c( person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre")), person("Kirill", "Müller", role = "aut"), person("Jim", "Hester", , "james.f.hester@gmail.com", role = "aut"), person("Maëlle", "Salmon", role = "ctb", comment = c(ORCID = "0000-0002-2815-0399")), person("Posit Software, PBC", role = c("cph", "fnd")) )'
+maintainer = 'Gábor Csárdi <csardi.gabor@gmail.com>'
+description = 'Tools to read, write, create, and manipulate DESCRIPTION files.  It is intended for packages that create or manipulate other packages.'
+url = 'https://desc.r-lib.org/, https://github.com/r-lib/desc'
+bugreports = 'https://github.com/r-lib/desc/issues'
+license = 'MIT + file LICENSE'
+imports = ['cli', 'R6', 'utils']
+suggests = ['callr', 'covr', 'gh', 'spelling', 'testthat', 'whoami', 'withr']
+roxygennote = '7.2.3'
+encoding = 'UTF-8'
+needscompilation = 'no'
+author = 'Gábor Csárdi [aut, cre], Kirill Müller [aut], Jim Hester [aut], Maëlle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>), Posit Software, PBC [cph, fnd]'
+'config/testthat/edition' = '3'
+'config/needs/website' = 'tidyverse/tidytemplate'
 
 [renv.packages.digest]
 package = 'digest'
@@ -823,6 +866,75 @@ author = 'Gábor Csárdi [aut, cre]'
 'config/testthat/edition' = '3'
 'config/needs/website' = 'tidyverse/tidytemplate'
 
+[renv.packages.pkgbuild]
+package = 'pkgbuild'
+version = '1.4.8'
+source = 'Repository'
+repository = 'RSPM'
+depends = ['R (>= 3.5)']
+hash = ''
+title = 'Find Tools Needed to Build R Packages'
+'authors@r' = 'c( person("Hadley", "Wickham", role = "aut"), person("Jim", "Hester", role = "aut"), person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre")), person("Posit Software, PBC", role = c("cph", "fnd"), comment = c(ROR = "03wc8by49")) )'
+maintainer = 'Gábor Csárdi <csardi.gabor@gmail.com>'
+description = 'Provides functions used to build R packages. Locates compilers needed to build R packages on various platforms and ensures the PATH is configured appropriately so R can use them.'
+url = 'https://github.com/r-lib/pkgbuild, https://pkgbuild.r-lib.org'
+bugreports = 'https://github.com/r-lib/pkgbuild/issues'
+license = 'MIT + file LICENSE'
+imports = ['callr (>= 3.2.0)', 'cli (>= 3.4.0)', 'desc', 'processx', 'R6']
+suggests = ['covr', 'cpp11', 'knitr', 'Rcpp', 'rmarkdown', 'testthat (>= 3.2.0)', 'withr (>= 2.3.0)']
+roxygennote = '7.3.2'
+encoding = 'UTF-8'
+needscompilation = 'no'
+author = 'Hadley Wickham [aut], Jim Hester [aut], Gábor Csárdi [aut, cre], Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)'
+'config/testthat/edition' = '3'
+'config/needs/website' = 'tidyverse/tidytemplate'
+
+[renv.packages.pkgload]
+package = 'pkgload'
+version = '1.5.0'
+source = 'Repository'
+repository = 'P3M'
+depends = ['R (>= 3.4.0)']
+hash = ''
+title = 'Simulate Package Installation and Attach'
+'authors@r' = 'c( person("Hadley", "Wickham", role = "aut"), person("Winston", "Chang", role = "aut"), person("Jim", "Hester", role = "aut"), person("Lionel", "Henry", , "lionel@posit.co", role = c("aut", "cre")), person("Posit Software, PBC", role = c("cph", "fnd")), person("R Core team", role = "ctb", comment = "Some namespace and vignette code extracted from base R") )'
+maintainer = 'Lionel Henry <lionel@posit.co>'
+description = "Simulates the process of installing a package and then attaching it. This is a key part of the 'devtools' package as it allows you to rapidly iterate while developing a package."
+url = 'https://github.com/r-lib/pkgload, https://pkgload.r-lib.org'
+bugreports = 'https://github.com/r-lib/pkgload/issues'
+license = 'MIT + file LICENSE'
+imports = ['cli (>= 3.3.0)', 'desc', 'fs', 'glue', 'lifecycle', 'methods', 'pkgbuild', 'processx', 'rlang (>= 1.1.1)', 'rprojroot', 'utils']
+suggests = ['bitops', 'jsonlite', 'mathjaxr', 'pak', 'Rcpp', 'remotes', 'rstudioapi', 'testthat (>= 3.2.1.1)', 'usethis', 'withr']
+roxygennote = '7.3.2'
+encoding = 'UTF-8'
+needscompilation = 'no'
+author = 'Hadley Wickham [aut], Winston Chang [aut], Jim Hester [aut], Lionel Henry [aut, cre], Posit Software, PBC [cph, fnd], R Core team [ctb] (Some namespace and vignette code extracted from base R)'
+'config/testthat/edition' = '3'
+'config/needs/website' = 'tidyverse/tidytemplate, ggplot2'
+
+[renv.packages.processx]
+package = 'processx'
+version = '3.8.6'
+source = 'Repository'
+repository = 'RSPM'
+depends = ['R (>= 3.4.0)']
+hash = ''
+title = 'Execute and Control System Processes'
+'authors@r' = 'c( person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-7098-9676")), person("Winston", "Chang", role = "aut"), person("Posit Software, PBC", role = c("cph", "fnd")), person("Ascent Digital Services", role = c("cph", "fnd")) )'
+maintainer = 'Gábor Csárdi <csardi.gabor@gmail.com>'
+description = "Tools to run system processes in the background.  It can check if a background process is running; wait on a background process to finish; get the exit status of finished processes; kill background processes. It can read the standard output and error of the processes, using non-blocking connections. 'processx' can poll a process for standard output or error, with a timeout. It can also poll several processes at once."
+url = 'https://processx.r-lib.org, https://github.com/r-lib/processx'
+bugreports = 'https://github.com/r-lib/processx/issues'
+license = 'MIT + file LICENSE'
+imports = ['ps (>= 1.2.0)', 'R6', 'utils']
+suggests = ['callr (>= 3.7.3)', 'cli (>= 3.3.0)', 'codetools', 'covr', 'curl', 'debugme', 'parallel', 'rlang (>= 1.0.2)', 'testthat (>= 3.0.0)', 'webfakes', 'withr']
+roxygennote = '7.3.1.9000'
+encoding = 'UTF-8'
+needscompilation = 'yes'
+author = 'Gábor Csárdi [aut, cre, cph] (<https://orcid.org/0000-0001-7098-9676>), Winston Chang [aut], Posit Software, PBC [cph, fnd], Ascent Digital Services [cph, fnd]'
+'config/testthat/edition' = '3'
+'config/needs/website' = 'tidyverse/tidytemplate'
+
 [renv.packages.promises]
 package = 'promises'
 version = '1.5.0'
@@ -847,6 +959,29 @@ needscompilation = 'no'
 author = 'Joe Cheng [aut], Barret Schloerke [aut, cre] (ORCID: <https://orcid.org/0000-0001-9986-114X>), Winston Chang [aut] (ORCID: <https://orcid.org/0000-0002-1576-2126>), Charlie Gao [aut] (ORCID: <https://orcid.org/0000-0002-0750-061X>), Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)'
 'config/testthat/edition' = '3'
 'config/needs/website' = 'rsconnect, tidyverse/tidytemplate'
+
+[renv.packages.ps]
+package = 'ps'
+version = '1.9.1'
+source = 'Repository'
+repository = 'RSPM'
+depends = ['R (>= 3.4)']
+hash = ''
+title = 'List, Query, Manipulate System Processes'
+'authors@r' = "c( person(\"Jay\", \"Loden\", role = \"aut\"), person(\"Dave\", \"Daeschler\", role = \"aut\"), person(\"Giampaolo\", \"Rodola'\", role = \"aut\"), person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )"
+maintainer = 'Gábor Csárdi <csardi.gabor@gmail.com>'
+description = "List, query and manipulate all system processes, on 'Windows', 'Linux' and 'macOS'."
+url = 'https://github.com/r-lib/ps, https://ps.r-lib.org/'
+bugreports = 'https://github.com/r-lib/ps/issues'
+license = 'MIT + file LICENSE'
+imports = ['utils']
+suggests = ['callr', 'covr', 'curl', 'pillar', 'pingr', 'processx (>= 3.1.0)', 'R6', 'rlang', 'testthat (>= 3.0.0)', 'webfakes', 'withr']
+roxygennote = '7.3.2'
+encoding = 'UTF-8'
+needscompilation = 'yes'
+author = "Jay Loden [aut], Dave Daeschler [aut], Giampaolo Rodola' [aut], Gábor Csárdi [aut, cre], Posit Software, PBC [cph, fnd]"
+'config/testthat/edition' = '3'
+'config/needs/website' = 'tidyverse/tidytemplate'
 
 [renv.packages.rappdirs]
 package = 'rappdirs'
