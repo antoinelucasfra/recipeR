@@ -109,7 +109,7 @@ mod_settings_ui <- function(id) {
             ns("import_file"),
             NULL,
             accept = c(".json", ".csv"),
-            placeholder = "Choose JSON or CSV\u2026"
+            placeholder = "Choose JSON or CSV..."
           ),
           actionButton(
             ns("import_btn"),
@@ -157,10 +157,10 @@ mod_settings_ui <- function(id) {
             tags$strong("Keyboard shortcuts:"),
             tags$br(),
             tags$kbd("/"),
-            " \u2014 Jump to search",
+            " -- Jump to search",
             tags$br(),
             tags$kbd("Esc"),
-            " \u2014 Exit cooking mode"
+            " -- Exit cooking mode"
           )
         )
       )
@@ -240,7 +240,7 @@ mod_settings_server <- function(id, rv, refresh_data, parent_session) {
       }
       delete_custom_density(row$ingredient)
       showNotification(
-        sprintf("Deleted density for \u2018%s\u2019", row$ingredient),
+        sprintf("Deleted density for '%s'", row$ingredient),
         type = "message"
       )
       output$densities_table <- DT::renderDataTable({

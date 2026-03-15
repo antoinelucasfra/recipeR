@@ -10,7 +10,7 @@ mod_ingredients_ui <- function(id) {
       tags$h1(class = "page-title", "Ingredient Inventory"),
       tags$p(
         class = "page-subtitle",
-        "Track what you have \u2014 drives recipe match scores"
+        "Track what you have -- drives recipe match scores"
       )
     ),
 
@@ -35,7 +35,7 @@ mod_ingredients_ui <- function(id) {
               textInput(
                 ns("ing_unit"),
                 "Unit",
-                placeholder = "cup, tsp, g\u2026",
+                placeholder = "cup, tsp, g...",
                 width = "100%"
               )
             ),
@@ -114,7 +114,7 @@ mod_ingredients_server <- function(id, rv, refresh_data) {
       )
       add_ingredient(ing)
       showNotification(
-        sprintf("Added/updated ingredient \u2018%s\u2019", name),
+        sprintf("Added/updated ingredient '%s'", name),
         type = "message"
       )
       updateTextInput(session, "ing_name", value = "")

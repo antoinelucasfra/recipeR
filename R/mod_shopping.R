@@ -10,7 +10,7 @@ mod_shopping_ui <- function(id) {
       tags$h1(class = "page-title", "Shopping List"),
       tags$p(
         class = "page-subtitle",
-        "Add manually or via a recipe\u2019s missing ingredients"
+        "Add manually or via a recipe's missing ingredients"
       )
     ),
 
@@ -77,10 +77,10 @@ mod_shopping_ui <- function(id) {
           tags$ul(
             style = "padding-left:1.2rem;",
             tags$li(
-              "Check items as you shop \u2014 then click Done to remove all checked."
+              "Check items as you shop -- then click Done to remove all checked."
             ),
             tags$li(
-              'Open a recipe and click \u201cAdd missing\u201d to bulk-add missing ingredients.'
+              'Open a recipe and click "Add missing" to bulk-add missing ingredients.'
             ),
             tags$li("Update quantities in the inventory tab when you restock.")
           )
@@ -181,7 +181,7 @@ mod_shopping_server <- function(id, rv) {
       }
       updateTextInput(session, "new_shop_item", value = "")
       showNotification(
-        sprintf("Added \u2018%s\u2019 to shopping list", item),
+        sprintf("Added '%s' to shopping list", item),
         type = "message"
       )
     })

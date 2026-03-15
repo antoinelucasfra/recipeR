@@ -60,7 +60,7 @@ mod_add_ui <- function(id) {
               options = list(
                 create = TRUE,
                 delimiter = ",",
-                placeholder = "e.g., Quick, Vegan, Asian\u2026"
+                placeholder = "e.g., Quick, Vegan, Asian..."
               ),
               width = "100%"
             )
@@ -68,7 +68,7 @@ mod_add_ui <- function(id) {
           tags$label("Ingredients", style = "margin-top:0.5rem;"),
           tags$small(
             class = "text-muted d-block mb-1",
-            'One per line \u2014 e.g. "1 1/2 cups flour"'
+            'One per line -- e.g. "1 1/2 cups flour"'
           ),
           textAreaInput(
             ns("new_ingredients_raw"),
@@ -202,7 +202,7 @@ mod_add_server <- function(id, rv, refresh_data) {
         last_modified = Sys.time()
       )
       added <- add_recipe(recipe)
-      showNotification(sprintf("Saved recipe \u2018%s\u2019", added$title), type = "message")
+      showNotification(sprintf("Saved recipe '%s'", added$title), type = "message")
       updateTextInput(session, "new_title", value = "")
       updateTextInput(session, "new_source", value = "")
       updateTextInput(session, "new_source_url", value = "")

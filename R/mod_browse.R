@@ -143,9 +143,9 @@ mod_browse_ui <- function(id) {
             NULL,
             choices = c(
               "Best Match" = "match",
-              "Title A\u2192Z" = "title",
+              "Title A->Z" = "title",
               "Newest First" = "date",
-              "Cuisine A\u2192Z" = "cuisine"
+              "Cuisine A->Z" = "cuisine"
             ),
             selected = "match",
             width = "160px"
@@ -370,7 +370,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
           "low"
         }
         bar_pct <- if (is.na(pct)) 0L else as.integer(pct)
-        match_label <- if (is.na(pct)) "\u2014" else paste0(pct, "%")
+        match_label <- if (is.na(pct)) "--" else paste0(pct, "%")
 
         tags$div(
           class = "recipe-card",
@@ -422,7 +422,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
           ) {
             tags$span(
               class = "recipe-rating",
-              paste(rep("\u2605", as.integer(r$rating)), collapse = "")
+              paste(rep("*", as.integer(r$rating)), collapse = "")
             )
           },
 
@@ -623,7 +623,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
           tags$div(
             class = "drawer-meta-item",
             tags$div(class = "dm-label", "Cuisine"),
-            tags$div(class = "dm-value", r$source %||% "\u2014")
+            tags$div(class = "dm-value", r$source %||% "--")
           ),
           tags$div(
             class = "drawer-meta-item",
@@ -774,7 +774,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
                 tags$div(
                   class = "drawer-meta-item",
                   tags$div(class = "dm-label", "Cuisine"),
-                  tags$div(class = "dm-value", r$source %||% "\u2014")
+                  tags$div(class = "dm-value", r$source %||% "--")
                 ),
                 tags$div(
                   class = "drawer-meta-item",
@@ -878,7 +878,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
               missing_to_add <- get_missing_ingredients(r, rv$ingredients)
               if (length(missing_to_add) == 0) {
                 showNotification(
-                  "No missing ingredients \u2014 you have everything!",
+                  "No missing ingredients -- you have everything!",
                   type = "message"
                 )
                 return()
@@ -961,7 +961,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
               add_recipe(r_copy)
               refresh_data()
               showNotification(
-                sprintf("Duplicated as \u2018%s\u2019", r_copy$title),
+                sprintf("Duplicated as '%s'", r_copy$title),
                 type = "message"
               )
             },
@@ -1047,7 +1047,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
                     list(step_number = i, instruction_text = inst_lines[i])
                   })
                   update_recipe(id_now, updated)
-                  showNotification(sprintf("Updated \u2018%s\u2019", new_title), type = "message")
+                  showNotification(sprintf("Updated '%s'", new_title), type = "message")
                   refresh_data()
                   removeModal()
                 },
@@ -1075,7 +1075,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
                 {
                   delete_recipe(id_now)
                   showNotification(
-                    sprintf("Deleted \u2018%s\u2019", r$title),
+                    sprintf("Deleted '%s'", r$title),
                     type = "message"
                   )
                   refresh_data()

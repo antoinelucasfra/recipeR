@@ -26,7 +26,7 @@ mod_cooking_server <- function(id, rv) {
 
       prev_btn <- actionButton(
         ns("cook_prev"),
-        "\u2190 Previous",
+        "<- Previous",
         class = "btn btn-secondary btn-lg"
       )
 
@@ -74,7 +74,7 @@ mod_cooking_server <- function(id, rv) {
           tags$span(class = "cooking-nav-counter", paste0(step, " / ", n_steps)),
           actionButton(
             ns("cook_next"),
-            if (is_last) "\U0001F389 Finish" else "Next \u2192",
+            if (is_last) "Done! Finish" else "Next ->",
             class = if (is_last) "btn btn-success btn-lg" else "btn btn-primary btn-lg"
           )
         )
@@ -97,7 +97,7 @@ mod_cooking_server <- function(id, rv) {
       n_steps <- length(r$instructions)
       if (rv$cooking_step >= n_steps) {
         showNotification(
-          paste0("You finished cooking \u2018", r$title, "\u2019! \U0001F389"),
+          paste0("You finished cooking '", r$title, "'! Done!"),
           type = "message"
         )
         rv$cooking_recipe <- NULL
