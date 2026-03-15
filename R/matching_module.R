@@ -16,7 +16,8 @@ calculate_match <- function(recipe, inventory) {
   }))
 
   matched <- sum(sapply(req_names, function(r) {
-    any(grepl(r, inv_names, fixed = TRUE))
+    # bidirectional: recipe_ing in inv_name OR inv_name in recipe_ing
+    any(grepl(r, inv_names, fixed = TRUE) | grepl(inv_names, r, fixed = TRUE))
   }))
 
   round(100 * matched / length(req_names))
@@ -38,7 +39,10 @@ get_missing_ingredients <- function(recipe, inventory) {
 
   missing <- req_names[
     !sapply(tolower(req_names), function(rr) {
-      any(grepl(tolower(rr), inv_names, fixed = TRUE))
+      any(
+        grepl(tolower(rr), inv_names, fixed = TRUE) |
+          grepl(inv_names, tolower(rr), fixed = TRUE)
+      )
     })
   ]
 

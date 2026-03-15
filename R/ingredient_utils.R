@@ -319,7 +319,7 @@ get_density <- function(name) {
     return(dt$milk)
   }
   if (grepl("oil", n)) {
-    return(dt$oil)
+    return(dt$vegetable_oil)
   }
   if (grepl("water", n)) {
     return(dt$water)

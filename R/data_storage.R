@@ -21,7 +21,17 @@ load_db <- function() {
   if (!file.exists(f)) {
     return(list(recipes = list(), ingredients = list()))
   }
-  readRDS(f)
+  tryCatch(
+    readRDS(f),
+    error = function(e) {
+      warning(
+        "recipeR: could not read data file (",
+        conditionMessage(e),
+        "). Starting with empty database."
+      )
+      list(recipes = list(), ingredients = list())
+    }
+  )
 }
 
 save_db <- function(db) {
@@ -83,9 +93,9 @@ import_recipes_json <- function(path, overwrite = FALSE) {
   if (is.null(obj$recipes)) {
     stop("Invalid import format: 'recipes' missing")
   }
+  # Load DB once outside the loop to avoid O(n) disk reads
+  db <- load_db()
   for (r in obj$recipes) {
-    # use title+source_url as dedupe key
-    db <- load_db()
     dup <- NULL
     if (!is.null(r$recipe_id) && !is.null(db$recipes[[r$recipe_id]])) {
       dup <- r$recipe_id
@@ -94,6 +104,8 @@ import_recipes_json <- function(path, overwrite = FALSE) {
       next
     }
     add_recipe(r)
+    # Refresh snapshot so next iteration sees already-written recipes
+    db <- load_db()
   }
   invisible(TRUE)
 }

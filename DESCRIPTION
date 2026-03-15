@@ -12,6 +12,7 @@ Imports:
     jsonlite,
     shiny,
     shinyjs,
+    shinythemes,
     shinyWidgets,
     tools,
     utils
