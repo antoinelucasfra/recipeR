@@ -8,13 +8,12 @@ app_server <- function(input, output, session) {
   rv <- reactiveValues(
     recipes = list(),
     ingredients = list(),
-    shopping = list(),
+    shopping = character(),
     compare_pair = NULL,
-    selected_card_ids = character(),
-    cooking_recipe = NULL,
-    cooking_step = 1L
+    selected_card_ids = character() # tracks cards selected for compare
   )
 
+  # FIX P1: selected_recipe as reactiveVal so renderUI auto-invalidates
   selected_recipe <- reactiveVal(NULL)
 
   refresh_data <- function() {
@@ -26,19 +25,7 @@ app_server <- function(input, output, session) {
   refresh_data()
 
   # ---------------------------------------------------------------------------
-  # Theme toggle
-  # ---------------------------------------------------------------------------
-  observeEvent(input$color_mode, {
-    if (input$color_mode == "light") {
-      session$setCurrentTheme(app_theme_light())
-    } else {
-      session$setCurrentTheme(app_theme_dark())
-    }
-    save_prefs(c(get_prefs(), list(color_mode = input$color_mode)))
-  })
-
-  # ---------------------------------------------------------------------------
-  # Filtered recipes reactive with sort
+  # P3: Single filtered_recipes reactive — eliminates 7 copy-pastes
   # ---------------------------------------------------------------------------
   filtered_recipes <- reactive({
     recs <- rv$recipes
@@ -57,24 +44,6 @@ app_server <- function(input, output, session) {
         function(r) (r$source_url %||% "") %in% input$source_filter,
         recs
       )
-    }
-    sort_by <- input$browse_sort %||% "match"
-    inv <- rv$ingredients
-    if (sort_by == "title") {
-      recs <- recs[order(sapply(recs, function(r) tolower(r$title %||% "")))]
-    } else if (sort_by == "date") {
-      dates <- sapply(recs, function(r) {
-        d <- r$date_added
-        if (is.null(d)) as.POSIXct("1970-01-01") else as.POSIXct(d)
-      })
-      recs <- recs[order(dates, decreasing = TRUE)]
-    } else if (sort_by == "cuisine") {
-      recs <- recs[order(sapply(recs, function(r) tolower(r$source %||% "")))]
-    } else {
-      if (length(inv) > 0 && length(recs) > 0) {
-        scores <- sapply(recs, function(r) calculate_match(r, inv))
-        recs <- recs[order(scores, decreasing = TRUE)]
-      }
     }
     recs
   })
@@ -105,14 +74,14 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Filter panel show/hide
+  # P1 FIX: Filter panel show/hide — use shinyjs::toggle instead of toggleClass
   # ---------------------------------------------------------------------------
   observeEvent(input$toggle_filters, {
     shinyjs::toggle("filter_panel")
   })
 
   # ---------------------------------------------------------------------------
-  # Cuisine filter choices populated dynamically from rv$recipes
+  # P3: Cuisine filter choices populated dynamically from rv$recipes
   # ---------------------------------------------------------------------------
   observeEvent(
     rv$recipes,
@@ -120,38 +89,24 @@ app_server <- function(input, output, session) {
       cuisines <- sort(unique(sapply(rv$recipes, function(r) {
         if (!is.null(r$source) && nzchar(r$source)) r$source else "Unknown"
       })))
-      shinyWidgets::updatePickerInput(
-        session,
-        "cuisine_filter",
-        choices = cuisines
-      )
+      shinyWidgets::updatePickerInput(session, "cuisine_filter", choices = cuisines)
 
       sources <- unique(sapply(rv$recipes, function(r) r$source_url %||% ""))
       sources <- sort(sources[nzchar(sources)])
-      shinyWidgets::updatePickerInput(
-        session,
-        "source_filter",
-        choices = sources
-      )
+      shinyWidgets::updatePickerInput(session, "source_filter", choices = sources)
     },
     ignoreInit = TRUE
   )
 
+  # Reset All Filters
   observeEvent(input$reset_filters, {
-    shinyWidgets::updatePickerInput(
-      session,
-      "cuisine_filter",
-      selected = character(0)
-    )
-    shinyWidgets::updatePickerInput(
-      session,
-      "source_filter",
-      selected = character(0)
-    )
+    shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = character(0))
+    shinyWidgets::updatePickerInput(session, "source_filter", selected = character(0))
     updateTextInput(session, "search_query", value = "")
     showNotification("Filters reset", type = "message")
   })
 
+  # Select All Filters — derives from current dynamic choices
   observeEvent(input$select_all_filters, {
     all_cuisines <- sort(unique(sapply(rv$recipes, function(r) {
       if (!is.null(r$source) && nzchar(r$source)) r$source else "Unknown"
@@ -165,7 +120,7 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Browse: recipe cards grid
+  # Browse: recipe cards grid + stats — all use filtered_recipes()
   # ---------------------------------------------------------------------------
   output$recipe_cards_grid <- renderUI({
     recs <- filtered_recipes()
@@ -209,25 +164,9 @@ app_server <- function(input, output, session) {
           ""
         },
 
-        if (!is.null(r$image_url) && nzchar(r$image_url)) {
-          tags$div(
-            class = "card-thumbnail",
-            tags$img(src = r$image_url, class = "recipe-thumb")
-          )
-        },
-
         tags$div(
           class = "recipe-card-header",
-          tags$div(
-            class = "recipe-card-title",
-            if (isTRUE(r$is_favorite)) {
-              tags$i(
-                class = "fas fa-heart",
-                style = "color:#ef4444;margin-right:0.3rem;"
-              )
-            },
-            r$title
-          ),
+          tags$div(class = "recipe-card-title", r$title),
           if (!is.null(r$source) && nzchar(r$source)) {
             tags$span(class = "cuisine-badge", r$source)
           }
@@ -246,24 +185,6 @@ app_server <- function(input, output, session) {
             paste0(" ", length(r$instructions), " steps")
           )
         ),
-
-        if (
-          !is.null(r$rating) &&
-            !is.na(r$rating) &&
-            nzchar(as.character(r$rating))
-        ) {
-          tags$span(
-            class = "recipe-rating",
-            paste(rep("\u2605", as.integer(r$rating)), collapse = "")
-          )
-        },
-
-        if (!is.null(r$tags) && length(r$tags) > 0) {
-          tags$div(
-            class = "recipe-tags-row",
-            lapply(r$tags, function(t) tags$span(class = "recipe-tag", t))
-          )
-        },
 
         tags$div(
           class = "match-bar-wrap",
@@ -296,19 +217,6 @@ app_server <- function(input, output, session) {
             title = "Delete",
             `data-bs-toggle` = "tooltip"
           ),
-          actionButton(
-            paste0("dup_", rid),
-            icon("copy"),
-            class = "btn btn-secondary btn-sm",
-            title = "Duplicate"
-          ),
-          if (length(r$instructions) > 0) {
-            actionButton(
-              paste0("cook_", rid),
-              tagList(tags$i(class = "fas fa-fire"), " Cook"),
-              class = "btn btn-info btn-sm"
-            )
-          },
           actionButton(
             paste0("cmp_", rid),
             if (is_selected) {
@@ -354,6 +262,7 @@ app_server <- function(input, output, session) {
     length(unique(sapply(recs, function(r) r$source)))
   })
 
+  # Compare button — uses rv$selected_card_ids populated by cmp_ buttons
   observeEvent(input$compare_selected, {
     sel_ids <- rv$selected_card_ids
     if (length(sel_ids) != 2) {
@@ -366,10 +275,7 @@ app_server <- function(input, output, session) {
     r1 <- rv$recipes[[sel_ids[1]]]
     r2 <- rv$recipes[[sel_ids[2]]]
     if (is.null(r1) || is.null(r2)) {
-      showNotification(
-        "One or both selected recipes not found.",
-        type = "error"
-      )
+      showNotification("One or both selected recipes not found.", type = "error")
       return()
     }
     rv$compare_pair <- list(r1, r2)
@@ -385,27 +291,10 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Recipe detail drawer
+  # Recipe detail drawer — reactive to selected_recipe(), includes scaling
   # ---------------------------------------------------------------------------
+  # drawer_scale holds current scale multiplier for the open recipe
   drawer_scale <- reactiveVal(1)
-
-  output$drawer_title <- renderUI({
-    r <- selected_recipe()
-    if (is.null(r)) {
-      return(NULL)
-    }
-    if (isTRUE(r$is_favorite)) {
-      tagList(
-        tags$i(
-          class = "fas fa-heart",
-          style = "color:#ef4444;margin-right:0.4rem;"
-        ),
-        r$title
-      )
-    } else {
-      r$title
-    }
-  })
 
   output$recipe_detail_content <- renderUI({
     r <- selected_recipe()
@@ -419,6 +308,7 @@ app_server <- function(input, output, session) {
     sys <- if (!is.null(prefs$unit_system)) prefs$unit_system else "american"
     inv <- rv$ingredients
 
+    # Determine missing ingredients
     inv_names <- tolower(sapply(inv, function(x) {
       if (!is.null(x$ingredient_name)) x$ingredient_name else ""
     }))
@@ -430,18 +320,11 @@ app_server <- function(input, output, session) {
       )
     })
 
+    # Scale + convert ingredients
     scaled_ings <- lapply(seq_along(r$ingredients), function(idx) {
       i <- r$ingredients[[idx]]
-      orig_qty <- if (!is.null(i$quantity) && !is.na(i$quantity)) {
-        i$quantity
-      } else {
-        NA_real_
-      }
-      orig_unit <- if (!is.null(i$unit) && !is.na(i$unit)) {
-        i$unit
-      } else {
-        NA_character_
-      }
+      orig_qty <- if (!is.null(i$quantity) && !is.na(i$quantity)) i$quantity else NA_real_
+      orig_unit <- if (!is.null(i$unit) && !is.na(i$unit)) i$unit else NA_character_
       if (!is.na(orig_qty)) {
         new_qty <- as.numeric(orig_qty) * mult
         conv <- tryCatch(
@@ -476,10 +359,7 @@ app_server <- function(input, output, session) {
 
     ing_rows <- lapply(scaled_ings, function(si) {
       tags$div(
-        class = paste(
-          "ingredient-row",
-          if (isTRUE(si$missing)) "missing" else ""
-        ),
+        class = paste("ingredient-row", if (isTRUE(si$missing)) "missing" else ""),
         tags$i(
           class = if (isTRUE(si$missing)) "fas fa-xmark" else "fas fa-check"
         ),
@@ -498,10 +378,7 @@ app_server <- function(input, output, session) {
     scale_input_id <- paste0("drawer_scale_", rid)
 
     list(
-      if (!is.null(r$image_url) && nzchar(r$image_url)) {
-        tags$img(src = r$image_url, class = "drawer-hero-image")
-      },
-
+      # Meta grid
       tags$div(
         class = "drawer-meta-grid",
         tags$div(
@@ -530,13 +407,7 @@ app_server <- function(input, output, session) {
         )
       ),
 
-      if (!is.null(r$tags) && length(r$tags) > 0) {
-        tags$div(
-          class = "recipe-tags-row",
-          lapply(r$tags, function(t) tags$span(class = "recipe-tag", t))
-        )
-      },
-
+      # Scale widget
       tags$div(
         class = "scale-widget",
         tags$div(
@@ -545,7 +416,7 @@ app_server <- function(input, output, session) {
           " Scale Recipe"
         ),
         tags$div(
-          style = "display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;",
+          style = "display:flex;align-items:center;gap:0.75rem;",
           numericInput(
             scale_input_id,
             NULL,
@@ -554,41 +425,7 @@ app_server <- function(input, output, session) {
             step = 0.25,
             width = "100px"
           ),
-          tags$span(
-            class = "text-muted",
-            style = "font-size:0.8rem;",
-            "\u00d7 servings"
-          ),
-          selectInput(
-            paste0("drawer_rating_", rid),
-            NULL,
-            choices = c(
-              "No rating" = "",
-              "1 star" = "1",
-              "2 stars" = "2",
-              "3 stars" = "3",
-              "4 stars" = "4",
-              "5 stars" = "5"
-            ),
-            selected = as.character(r$rating %||% ""),
-            width = "130px"
-          ),
-          actionButton(
-            paste0("fav_", rid),
-            if (isTRUE(r$is_favorite)) {
-              tagList(tags$i(class = "fas fa-heart"), " Unfavorite")
-            } else {
-              tagList(tags$i(class = "far fa-heart"), " Favorite")
-            },
-            class = "btn btn-outline-danger btn-sm"
-          ),
-          if (length(r$instructions) > 0) {
-            actionButton(
-              paste0("cook_", rid),
-              tagList(tags$i(class = "fas fa-fire"), " Cook"),
-              class = "btn btn-info btn-sm"
-            )
-          },
+          tags$span(class = "text-muted", style = "font-size:0.8rem;", "\u00d7 servings"),
           actionButton(
             paste0("addshop_", rid),
             tagList(tags$i(class = "fas fa-cart-plus"), " Add missing"),
@@ -599,6 +436,7 @@ app_server <- function(input, output, session) {
         )
       ),
 
+      # Source link
       if (!is.null(r$source_url) && nzchar(r$source_url)) {
         tags$div(
           class = "drawer-section",
@@ -611,6 +449,7 @@ app_server <- function(input, output, session) {
         )
       },
 
+      # Ingredients
       tags$div(
         class = "drawer-section",
         tags$div(
@@ -621,6 +460,7 @@ app_server <- function(input, output, session) {
         ing_rows
       ),
 
+      # Instructions
       tags$div(
         class = "drawer-section",
         tags$div(
@@ -633,6 +473,7 @@ app_server <- function(input, output, session) {
     )
   })
 
+  # Render compare modal content
   output$recipe_compare_content <- renderUI({
     pair <- rv$compare_pair
     if (is.null(pair) || length(pair) != 2) {
@@ -641,13 +482,7 @@ app_server <- function(input, output, session) {
 
     make_col <- function(r) {
       ings <- lapply(r$ingredients, function(i) {
-        tags$li(
-          if (!is.null(i$raw_text) && nzchar(i$raw_text)) {
-            i$raw_text
-          } else {
-            i$ingredient_name
-          }
-        )
+        tags$li(if (!is.null(i$raw_text) && nzchar(i$raw_text)) i$raw_text else i$ingredient_name)
       })
       inst <- lapply(r$instructions, function(s) tags$li(s$instruction_text))
       tags$div(
@@ -724,184 +559,7 @@ app_server <- function(input, output, session) {
   }
 
   # ---------------------------------------------------------------------------
-  # output$ingredient_preview — live preview for Add Recipe pane
-  # ---------------------------------------------------------------------------
-  output$ingredient_preview <- renderUI({
-    raw <- input$new_ingredients_raw
-    if (is.null(raw) || !nzchar(trimws(raw))) {
-      return(tags$p(
-        class = "text-muted fst-italic",
-        "Ingredients will preview here as you type..."
-      ))
-    }
-    lines <- trimws(unlist(strsplit(as.character(raw), "[\\r\\n]+")))
-    lines <- lines[nzchar(lines)]
-    if (length(lines) == 0) {
-      return(tags$p(
-        class = "text-muted fst-italic",
-        "Ingredients will preview here as you type..."
-      ))
-    }
-    rows <- lapply(lines, function(line) {
-      p <- parse_ingredient_line(line)
-      qty_str <- if (!is.null(p$quantity) && !is.na(p$quantity)) {
-        as.character(p$quantity)
-      } else {
-        ""
-      }
-      unit_str <- if (!is.null(p$unit) && !is.na(p$unit) && nzchar(p$unit)) {
-        p$unit
-      } else {
-        ""
-      }
-      name_str <- if (!is.null(p$name) && nzchar(p$name)) p$name else ""
-      tags$div(
-        class = "preview-ingredient-row",
-        tags$span(class = "preview-qty", qty_str),
-        tags$span(class = "preview-unit", unit_str),
-        tags$span(class = "preview-name", name_str)
-      )
-    })
-    tagList(
-      tags$p(
-        class = "text-muted",
-        style = "font-size:0.8rem;margin-bottom:0.5rem;",
-        paste0(length(lines), " ingredient(s) detected")
-      ),
-      tags$div(class = "preview-ingredients-list", rows)
-    )
-  })
-
-  # ---------------------------------------------------------------------------
-  # output$inventory_stats
-  # ---------------------------------------------------------------------------
-  output$inventory_stats <- renderUI({
-    ings <- rv$ingredients
-    if (length(ings) == 0) {
-      return(tags$p(class = "text-muted", "No ingredients yet."))
-    }
-    n_staple <- sum(sapply(ings, function(i) isTRUE(i$is_staple)))
-    tagList(
-      tags$div(class = "stat-number", length(ings)),
-      tags$p(class = "text-muted", "Total items"),
-      tags$hr(),
-      tags$p(paste0(n_staple, " staple item(s)"))
-    )
-  })
-
-  # ---------------------------------------------------------------------------
-  # output$cooking_mode_ui
-  # ---------------------------------------------------------------------------
-  output$cooking_mode_ui <- renderUI({
-    r <- rv$cooking_recipe
-    if (is.null(r)) {
-      return(tags$p(class = "text-muted", "No recipe selected for cooking."))
-    }
-    step <- rv$cooking_step
-    steps <- r$instructions
-    n_steps <- length(steps)
-    step_text <- if (step <= n_steps) steps[[step]]$instruction_text else ""
-    is_last <- step >= n_steps
-
-    prev_btn <- actionButton(
-      "cook_prev",
-      "\u2190 Previous",
-      class = "btn btn-secondary btn-lg"
-    )
-
-    tags$div(
-      class = "cooking-wrapper",
-      tags$div(
-        class = "cooking-header",
-        actionButton(
-          "cook_exit",
-          tagList(tags$i(class = "fas fa-times"), " Exit"),
-          class = "btn btn-secondary btn-sm"
-        ),
-        tags$div(class = "cooking-recipe-title", r$title),
-        tags$div(
-          class = "cooking-step-badge",
-          paste0("Step ", step, " of ", n_steps)
-        )
-      ),
-      tags$div(
-        class = "cooking-progress",
-        tags$div(
-          class = "cooking-progress-fill",
-          style = paste0("width:", round(step / n_steps * 100), "%;")
-        )
-      ),
-      tags$div(
-        class = "cooking-step-content",
-        tags$div(class = "cooking-step-number", paste0("Step ", step)),
-        tags$div(class = "cooking-step-text", step_text)
-      ),
-      tags$div(
-        class = "cooking-ingredients",
-        tags$ul(
-          class = "cooking-ing-list",
-          lapply(r$ingredients, function(i) {
-            tags$li(
-              if (!is.null(i$raw_text) && nzchar(i$raw_text)) {
-                i$raw_text
-              } else {
-                i$ingredient_name
-              }
-            )
-          })
-        )
-      ),
-      tags$div(
-        class = "cooking-nav",
-        if (step == 1L) shinyjs::disabled(prev_btn) else prev_btn,
-        tags$span(class = "cooking-nav-counter", paste0(step, " / ", n_steps)),
-        actionButton(
-          "cook_next",
-          if (is_last) "\U0001F389 Finish" else "Next \u2192",
-          class = if (is_last) {
-            "btn btn-success btn-lg"
-          } else {
-            "btn btn-primary btn-lg"
-          }
-        )
-      )
-    )
-  })
-
-  # ---------------------------------------------------------------------------
-  # Cooking mode observers
-  # ---------------------------------------------------------------------------
-  observeEvent(input$cook_exit, {
-    rv$cooking_recipe <- NULL
-    rv$cooking_step <- 1L
-    shinyjs::runjs("window.recipeR_navigate('browse')")
-  })
-
-  observeEvent(input$cook_prev, {
-    rv$cooking_step <- max(1L, rv$cooking_step - 1L)
-  })
-
-  observeEvent(input$cook_next, {
-    r <- rv$cooking_recipe
-    if (is.null(r)) {
-      return()
-    }
-    n_steps <- length(r$instructions)
-    if (rv$cooking_step >= n_steps) {
-      showNotification(
-        paste0("You finished cooking \u2018", r$title, "\u2019! \U0001F389"),
-        type = "message"
-      )
-      rv$cooking_recipe <- NULL
-      rv$cooking_step <- 1L
-      shinyjs::runjs("window.recipeR_navigate('browse')")
-    } else {
-      rv$cooking_step <- rv$cooking_step + 1L
-    }
-  })
-
-  # ---------------------------------------------------------------------------
-  # Save new recipe
+  # P1 FIX: source_url correctly read on save
   # ---------------------------------------------------------------------------
   observeEvent(input$save_recipe, {
     title <- input$new_title
@@ -909,14 +567,9 @@ app_server <- function(input, output, session) {
       showNotification("Please provide a recipe title.", type = "error")
       return()
     }
-    instr_lines <- trimws(unlist(strsplit(
-      as.character(input$new_instructions),
-      "[\r\n]+"
-    )))
+    instr_lines <- trimws(unlist(strsplit(as.character(input$new_instructions), "[\r\n]+")))
     instr_lines <- instr_lines[nzchar(instr_lines)]
     src_url <- trimws(input$new_source_url)
-    img_url <- trimws(input$new_image_url %||% "")
-    servings_raw <- suppressWarnings(as.numeric(input$new_servings))
 
     recipe <- list(
       title = title,
@@ -926,25 +579,16 @@ app_server <- function(input, output, session) {
       instructions = lapply(seq_along(instr_lines), function(i) {
         list(step_number = i, instruction_text = instr_lines[i])
       }),
-      tags = if (!is.null(input$new_tags)) input$new_tags else character(0),
-      servings = if (!is.na(servings_raw)) servings_raw else NULL,
-      image_url = if (nzchar(img_url)) img_url else NULL,
       date_added = Sys.time(),
       last_modified = Sys.time()
     )
     added <- add_recipe(recipe)
-    showNotification(
-      sprintf("Saved recipe \u2018%s\u2019", added$title),
-      type = "message"
-    )
+    showNotification(sprintf("Saved recipe '%s'", added$title), type = "message")
     updateTextInput(session, "new_title", value = "")
     updateTextInput(session, "new_source", value = "")
     updateTextInput(session, "new_source_url", value = "")
     updateTextAreaInput(session, "new_ingredients_raw", value = "")
     updateTextAreaInput(session, "new_instructions", value = "")
-    updateSelectizeInput(session, "new_tags", selected = character(0))
-    updateTextInput(session, "new_image_url", value = "")
-    updateNumericInput(session, "new_servings", value = NA)
     refresh_data()
   })
 
@@ -954,9 +598,6 @@ app_server <- function(input, output, session) {
     updateTextInput(session, "new_source_url", value = "")
     updateTextAreaInput(session, "new_ingredients_raw", value = "")
     updateTextAreaInput(session, "new_instructions", value = "")
-    updateSelectizeInput(session, "new_tags", selected = character(0))
-    updateTextInput(session, "new_image_url", value = "")
-    updateNumericInput(session, "new_servings", value = NA)
   })
 
   # ---------------------------------------------------------------------------
@@ -976,16 +617,14 @@ app_server <- function(input, output, session) {
       is_staple = FALSE
     )
     add_ingredient(ing)
-    showNotification(
-      sprintf("Added/updated ingredient \u2018%s\u2019", name),
-      type = "message"
-    )
+    showNotification(sprintf("Added/updated ingredient '%s'", name), type = "message")
     updateTextInput(session, "ing_name", value = "")
     updateNumericInput(session, "ing_qty", value = NA)
     updateTextInput(session, "ing_unit", value = "")
     refresh_data()
   })
 
+  # Delete ingredient from table
   observeEvent(input$delete_ing_btn, {
     id <- input$delete_ing_btn
     if (!is.null(id) && nzchar(id)) {
@@ -996,7 +635,7 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Per-recipe observers — registered once per recipe ID
+  # Per-recipe observers — registered once per recipe ID to avoid accumulation
   # ---------------------------------------------------------------------------
   observe({
     ids <- names(rv$recipes)
@@ -1017,14 +656,11 @@ app_server <- function(input, output, session) {
       cmpbtn <- paste0("cmp_", rid)
       addshop_btn <- paste0("addshop_", rid)
       scale_input <- paste0("drawer_scale_", rid)
-      inp_rating <- paste0("drawer_rating_", rid)
-      btn_fav <- paste0("fav_", rid)
-      btn_dup <- paste0("dup_", rid)
-      btn_cook <- paste0("cook_", rid)
 
       local({
         id_now <- rid
 
+        # --- View: open offcanvas drawer ---
         observeEvent(
           input[[btn]],
           {
@@ -1049,6 +685,7 @@ app_server <- function(input, output, session) {
           ignoreInit = TRUE
         )
 
+        # --- Scale change from drawer ---
         observeEvent(
           input[[scale_input]],
           {
@@ -1060,6 +697,7 @@ app_server <- function(input, output, session) {
           ignoreInit = TRUE
         )
 
+        # --- Add missing to shopping list (from drawer) ---
         observeEvent(
           input[[addshop_btn]],
           {
@@ -1076,25 +714,18 @@ app_server <- function(input, output, session) {
               return()
             }
             current <- get_shopping_list()
-            existing_texts <- sapply(current, function(x) x$text)
-            new_items <- lapply(
-              missing_to_add[!(missing_to_add %in% existing_texts)],
-              function(x) list(text = x, checked = FALSE)
-            )
-            combined <- c(current, new_items)
+            combined <- unique(c(current, missing_to_add))
             save_shopping_list(combined)
             rv$shopping <- combined
             showNotification(
-              sprintf(
-                "Added %d item(s) to shopping list",
-                length(missing_to_add)
-              ),
+              sprintf("Added %d item(s) to shopping list", length(missing_to_add)),
               type = "message"
             )
           },
           ignoreInit = TRUE
         )
 
+        # --- Compare toggle ---
         observeEvent(
           input[[cmpbtn]],
           {
@@ -1115,82 +746,7 @@ app_server <- function(input, output, session) {
           ignoreInit = TRUE
         )
 
-        observeEvent(
-          input[[inp_rating]],
-          {
-            r <- rv$recipes[[id_now]]
-            if (is.null(r)) {
-              return()
-            }
-            rating_val <- input[[inp_rating]]
-            r$rating <- if (!is.null(rating_val) && nzchar(rating_val)) {
-              as.integer(rating_val)
-            } else {
-              NULL
-            }
-            update_recipe(id_now, r)
-            refresh_data()
-          },
-          ignoreInit = TRUE
-        )
-
-        observeEvent(
-          input[[btn_fav]],
-          {
-            r <- rv$recipes[[id_now]]
-            if (is.null(r)) {
-              return()
-            }
-            r$is_favorite <- !isTRUE(r$is_favorite)
-            update_recipe(id_now, r)
-            refresh_data()
-            selected_recipe(rv$recipes[[id_now]])
-          },
-          ignoreInit = TRUE
-        )
-
-        observeEvent(
-          input[[btn_dup]],
-          {
-            r <- rv$recipes[[id_now]]
-            if (is.null(r)) {
-              return()
-            }
-            r_copy <- r
-            r_copy$title <- paste0(r$title, " (copy)")
-            r_copy$recipe_id <- NULL
-            add_recipe(r_copy)
-            refresh_data()
-            showNotification(
-              sprintf("Duplicated as \u2018%s\u2019", r_copy$title),
-              type = "message"
-            )
-          },
-          ignoreInit = TRUE
-        )
-
-        observeEvent(
-          input[[btn_cook]],
-          {
-            r <- rv$recipes[[id_now]]
-            if (is.null(r)) {
-              return()
-            }
-            rv$cooking_recipe <- r
-            rv$cooking_step <- 1L
-            shinyjs::runjs("window.recipeR_navigate('cooking')")
-            shinyjs::runjs(
-              paste0(
-                "(function(){",
-                "var el=document.getElementById('recipe_detail_drawer');",
-                "if(el){var oc=bootstrap.Offcanvas.getInstance(el);if(oc)oc.hide();}",
-                "})()"
-              )
-            )
-          },
-          ignoreInit = TRUE
-        )
-
+        # --- Edit modal ---
         observeEvent(
           input[[editbtn]],
           {
@@ -1213,11 +769,7 @@ app_server <- function(input, output, session) {
               title = paste0("Edit: ", r$title),
               textInput("edit_title", "Title", value = r$title),
               textInput("edit_source", "Cuisine/Source", value = r$source),
-              textInput(
-                "edit_source_url",
-                "Source URL",
-                value = r$source_url %||% ""
-              ),
+              textInput("edit_source_url", "Source URL", value = r$source_url %||% ""),
               textAreaInput(
                 "edit_ingredients",
                 "Ingredients (one per line)",
@@ -1250,23 +802,13 @@ app_server <- function(input, output, session) {
                 updated <- r
                 updated$title <- new_title
                 updated$source <- input$edit_source
-                updated$source_url <- if (nzchar(new_src_url)) {
-                  new_src_url
-                } else {
-                  NULL
-                }
+                updated$source_url <- if (nzchar(new_src_url)) new_src_url else NULL
                 updated$ingredients <- new_ings
-                updated$instructions <- lapply(
-                  seq_along(inst_lines),
-                  function(i) {
-                    list(step_number = i, instruction_text = inst_lines[i])
-                  }
-                )
+                updated$instructions <- lapply(seq_along(inst_lines), function(i) {
+                  list(step_number = i, instruction_text = inst_lines[i])
+                })
                 update_recipe(id_now, updated)
-                showNotification(
-                  sprintf("Updated \u2018%s\u2019", new_title),
-                  type = "message"
-                )
+                showNotification(sprintf("Updated '%s'", new_title), type = "message")
                 refresh_data()
                 removeModal()
               },
@@ -1276,6 +818,7 @@ app_server <- function(input, output, session) {
           ignoreInit = TRUE
         )
 
+        # --- Delete modal ---
         observeEvent(
           input[[delbtn]],
           {
@@ -1295,10 +838,7 @@ app_server <- function(input, output, session) {
               input$confirm_delete,
               {
                 delete_recipe(id_now)
-                showNotification(
-                  sprintf("Deleted \u2018%s\u2019", r$title),
-                  type = "message"
-                )
+                showNotification(sprintf("Deleted '%s'", r$title), type = "message")
                 refresh_data()
                 removeModal()
               },
@@ -1310,6 +850,7 @@ app_server <- function(input, output, session) {
       })
     })
 
+    # Record newly registered IDs
     session$userData$registered_recipe_ids <- c(registered, new_ids)
   })
 
@@ -1336,6 +877,7 @@ app_server <- function(input, output, session) {
     DT::datatable(df, rownames = FALSE, options = list(pageLength = 15))
   })
 
+  # Delete ingredient row from DT proxy
   observeEvent(input$ingredients_table_rows_selected, {
     sel <- input$ingredients_table_rows_selected
     if (is.null(sel) || length(sel) == 0) {
@@ -1370,56 +912,31 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Shopping list
+  # Shopping list tab
   # ---------------------------------------------------------------------------
   output$shopping_list_output <- renderUI({
     items <- rv$shopping
     if (length(items) == 0) {
       return(tags$p(class = "text-muted", "Shopping list is empty."))
     }
-    rows <- lapply(seq_along(items), function(i) {
-      item <- items[[i]]
-      tags$div(
-        style = "display:flex;align-items:center;padding:0.4rem 0;border-bottom:1px solid #f0f0f0;",
-        checkboxInput(
-          paste0("check_shop_", i),
-          label = item$text,
-          value = isTRUE(item$checked)
-        ),
-        actionButton(
-          paste0("remove_shop_", i),
-          NULL,
-          icon = icon("times"),
-          class = "btn btn-sm btn-outline-danger ms-2",
-          title = "Remove"
-        )
-      )
-    })
-    tags$div(rows)
-  })
-
-  observe({
-    items <- rv$shopping
-    lapply(seq_along(items), function(i) {
-      local({
-        idx <- i
-        observeEvent(
-          input[[paste0("check_shop_", idx)]],
-          {
-            current <- get_shopping_list()
-            if (idx <= length(current)) {
-              current[[idx]]$checked <- input[[paste0("check_shop_", idx)]]
-              save_shopping_list(current)
-              rv$shopping <- current
-            }
-          },
-          ignoreInit = TRUE,
-          once = FALSE
+    tags$ul(
+      lapply(seq_along(items), function(i) {
+        tags$li(
+          style = "padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0;",
+          tags$span(items[i]),
+          actionButton(
+            inputId = paste0("remove_shop_", i),
+            label = NULL,
+            icon = icon("times"),
+            class = "btn btn-sm btn-outline-danger ms-2",
+            title = "Remove"
+          )
         )
       })
-    })
+    )
   })
 
+  # Remove individual shopping item
   observe({
     items <- rv$shopping
     lapply(seq_along(items), function(i) {
@@ -1443,6 +960,7 @@ app_server <- function(input, output, session) {
     })
   })
 
+  # Add item manually to shopping list
   observeEvent(input$add_shop_item, {
     item <- trimws(input$new_shop_item)
     if (!nzchar(item)) {
@@ -1450,30 +968,17 @@ app_server <- function(input, output, session) {
       return()
     }
     current <- get_shopping_list()
-    existing_texts <- sapply(current, function(x) x$text)
-    if (!(item %in% existing_texts)) {
-      updated <- c(current, list(list(text = item, checked = FALSE)))
-      save_shopping_list(updated)
-      rv$shopping <- updated
-    }
-    updateTextInput(session, "new_shop_item", value = "")
-    showNotification(
-      sprintf("Added \u2018%s\u2019 to shopping list", item),
-      type = "message"
-    )
-  })
-
-  observeEvent(input$remove_checked_items, {
-    current <- get_shopping_list()
-    updated <- Filter(function(x) !isTRUE(x$checked), current)
+    updated <- unique(c(current, item))
     save_shopping_list(updated)
     rv$shopping <- updated
-    showNotification("Checked items removed", type = "message")
+    updateTextInput(session, "new_shop_item", value = "")
+    showNotification(sprintf("Added '%s' to shopping list", item), type = "message")
   })
 
+  # Clear shopping list
   observeEvent(input$clear_shop_list, {
-    save_shopping_list(list())
-    rv$shopping <- list()
+    save_shopping_list(character(0))
+    rv$shopping <- character(0)
     showNotification("Shopping list cleared", type = "message")
   })
 
@@ -1481,16 +986,12 @@ app_server <- function(input, output, session) {
   # Export handlers
   # ---------------------------------------------------------------------------
   output$export_json <- downloadHandler(
-    filename = function() {
-      paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".json")
-    },
+    filename = function() paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".json"),
     content = function(file) export_recipes_json(file)
   )
 
   output$export_csv <- downloadHandler(
-    filename = function() {
-      paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".csv")
-    },
+    filename = function() paste0("recipes_export_", format(Sys.time(), "%Y%m%d%H%M%S"), ".csv"),
     content = function(file) export_recipes_csv(file)
   )
 
@@ -1535,7 +1036,7 @@ app_server <- function(input, output, session) {
   })
 
   # ---------------------------------------------------------------------------
-  # Densities: table + add + delete custom
+  # Densities: table + add + P3: delete custom density
   # ---------------------------------------------------------------------------
   output$densities_table <- DT::renderDataTable({
     all_densities <- list_all_densities()
@@ -1555,10 +1056,7 @@ app_server <- function(input, output, session) {
       return()
     }
     if (is.null(ing_value) || is.na(ing_value) || ing_value <= 0) {
-      showNotification(
-        "Please enter a valid density value (must be > 0)",
-        type = "error"
-      )
+      showNotification("Please enter a valid density value (must be > 0)", type = "error")
       return()
     }
     add_custom_density(ing_name, ing_value)
@@ -1568,6 +1066,7 @@ app_server <- function(input, output, session) {
     )
     updateTextInput(session, "new_density_ingredient", value = "")
     updateNumericInput(session, "new_density_value", value = 1.0)
+    # Force re-render of densities table
     output$densities_table <- DT::renderDataTable({
       DT::datatable(
         list_all_densities(),
@@ -1578,6 +1077,7 @@ app_server <- function(input, output, session) {
     })
   })
 
+  # P3 FIX: delete selected custom density row
   observeEvent(input$delete_density_btn, {
     sel <- input$densities_table_rows_selected
     if (is.null(sel) || length(sel) == 0) {
@@ -1591,10 +1091,7 @@ app_server <- function(input, output, session) {
       return()
     }
     delete_custom_density(row$ingredient)
-    showNotification(
-      sprintf("Deleted density for \u2018%s\u2019", row$ingredient),
-      type = "message"
-    )
+    showNotification(sprintf("Deleted density for '%s'", row$ingredient), type = "message")
     output$densities_table <- DT::renderDataTable({
       DT::datatable(
         list_all_densities(),
@@ -1603,54 +1100,5 @@ app_server <- function(input, output, session) {
         options = list(pageLength = 10)
       )
     })
-  })
-
-  # ---------------------------------------------------------------------------
-  # Backup / Restore
-  # ---------------------------------------------------------------------------
-  observeEvent(input$backup_btn, {
-    backup_db()
-    showNotification("Backup created", type = "message")
-  })
-
-  observeEvent(input$restore_btn, {
-    backups <- list_backups()
-    if (length(backups) == 0) {
-      showNotification("No backups available", type = "warning")
-      return()
-    }
-    showModal(modalDialog(
-      title = "Restore Backup",
-      selectInput(
-        "restore_select",
-        "Choose backup to restore:",
-        choices = backups
-      ),
-      footer = tagList(
-        modalButton("Cancel"),
-        actionButton("confirm_restore", "Restore", class = "btn-warning")
-      )
-    ))
-    observeEvent(
-      input$confirm_restore,
-      {
-        path <- input$restore_select
-        tryCatch(
-          {
-            restore_backup(path)
-            showNotification("Backup restored successfully", type = "message")
-            refresh_data()
-          },
-          error = function(e) {
-            showNotification(
-              paste("Restore failed:", e$message),
-              type = "error"
-            )
-          }
-        )
-        removeModal()
-      },
-      once = TRUE
-    )
   })
 }

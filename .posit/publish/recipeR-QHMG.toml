@@ -13,7 +13,16 @@ files = [
   '/.posit/publish/deployments/deployment-8L76.toml',
   '/R',
   '/dev',
-  '/README.md'
+  '/README.md',
+  '/inst',
+  '/.posit',
+  '/DESCRIPTION',
+  '/NAMESPACE',
+  '/.Rbuildignore',
+  '/.gitignore',
+  '/.Rprofile',
+  '/man',
+  '/renv'
 ]
 title = 'recipeR'
 

@@ -1,107 +1,98 @@
 /* ==========================================================================
-   recipeR — Design System
-   bslib 0.9 + Bootstrap 5  |  dark & light mode via [data-bs-theme]
+   recipeR — Dark Mode Design System
+   Built for Bootstrap 5 (Shiny 1.7+)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   CSS Custom Properties — respond to bslib input_dark_mode() toggle
+   CSS Custom Properties — Design Tokens
    -------------------------------------------------------------------------- */
-:root,
-[data-bs-theme="dark"] {
+:root {
+  /* Dark palette */
   --bg:           #0f1117;
   --surface:      #1a1d27;
   --surface-2:    #22263a;
   --surface-3:    #2a2d3e;
   --border:       #2e3347;
   --border-light: #3a3f57;
+
+  /* Accent — indigo */
   --accent:       #6366f1;
   --accent-dark:  #4f52d4;
   --accent-glow:  rgba(99, 102, 241, 0.18);
   --accent-glow2: rgba(99, 102, 241, 0.08);
+
+  /* Semantic */
   --success:  #10b981;
   --warning:  #f59e0b;
   --danger:   #ef4444;
   --info:     #38bdf8;
+
+  /* Text */
   --text:       #e2e8f0;
   --text-muted: #94a3b8;
   --text-dim:   #64748b;
+
+  /* Layout */
+  --sidebar-w: 220px;
   --radius:    10px;
   --radius-sm: 6px;
+
+  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.45);
   --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-[data-bs-theme="light"] {
-  --bg:           #f8fafc;
-  --surface:      #ffffff;
-  --surface-2:    #f1f5f9;
-  --surface-3:    #e2e8f0;
-  --border:       #e2e8f0;
-  --border-light: #cbd5e1;
-  --accent:       #4f46e5;
-  --accent-dark:  #4338ca;
-  --accent-glow:  rgba(79, 70, 229, 0.12);
-  --accent-glow2: rgba(79, 70, 229, 0.06);
-  --success:  #059669;
-  --warning:  #d97706;
-  --danger:   #dc2626;
-  --info:     #0284c7;
-  --text:       #1e293b;
-  --text-muted: #64748b;
-  --text-dim:   #94a3b8;
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.55);
 }
 
 /* --------------------------------------------------------------------------
    Reset & Base
    -------------------------------------------------------------------------- */
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html, body {
   height: 100%;
   background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* bslib page_sidebar shell overrides */
-.bslib-page-sidebar {
-  background: var(--bg) !important;
-}
-
-.container-fluid { padding: 0 !important; }
-
-/* --------------------------------------------------------------------------
-   Sidebar (bslib generates .sidebar inside .bslib-sidebar-layout)
-   -------------------------------------------------------------------------- */
-.bslib-sidebar-layout > .sidebar {
-  background: var(--surface) !important;
-  border-right: 1px solid var(--border) !important;
-  padding: 0 !important;
-  overflow-y: auto;
-}
-
-/* bslib sidebar collapse/toggle button */
-.bslib-sidebar-layout .collapse-toggle {
-  background: var(--surface-2) !important;
-  border-color: var(--border) !important;
-  color: var(--text-muted) !important;
-}
-
-.bslib-sidebar-layout .collapse-toggle:hover {
-  color: var(--accent) !important;
-}
-
-/* Main content area */
-.bslib-sidebar-layout > .main,
-.bslib-page-sidebar > .main {
-  background: var(--bg) !important;
-  overflow-y: auto;
+/* Override Shiny's fluidPage padding */
+.container-fluid {
   padding: 0 !important;
 }
 
 /* --------------------------------------------------------------------------
-   Sidebar Navigation (custom classes inside bslib sidebar)
+   App Shell — Sidebar + Main
    -------------------------------------------------------------------------- */
+#app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Left Sidebar
+   -------------------------------------------------------------------------- */
+#app-sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+
 .sidebar-logo {
   display: flex;
   align-items: center;
@@ -151,10 +142,11 @@ html, body {
   font-weight: 500;
   border: 1px solid transparent;
   transition: all 0.15s ease;
+  text-decoration: none;
+  user-select: none;
   background: transparent;
   width: 100%;
   text-align: left;
-  user-select: none;
 }
 
 .sidebar-nav-item i {
@@ -177,31 +169,37 @@ html, body {
   border-color: rgba(99, 102, 241, 0.25);
 }
 
-.sidebar-nav-item.active i { color: var(--accent); }
+.sidebar-nav-item.active i {
+  color: var(--accent);
+}
 
 .sidebar-footer {
   padding: 0.75rem 1rem;
   border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.sidebar-hint {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
 }
 
 /* --------------------------------------------------------------------------
-   Content Pane (JS tab switching)
+   Main Content Area
    -------------------------------------------------------------------------- */
+#main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  background: var(--bg);
+  overflow-y: auto;
+}
+
 .content-pane {
   display: none;
   padding: 2rem 2.5rem;
   max-width: 1280px;
 }
 
-.content-pane.active { display: block; }
+.content-pane.active {
+  display: block;
+}
 
 /* --------------------------------------------------------------------------
    Page Header
@@ -223,12 +221,83 @@ html, body {
 .page-subtitle {
   color: var(--text-muted);
   font-size: 0.875rem;
-  margin: 0;
 }
 
 /* --------------------------------------------------------------------------
-   Feature Cards (Home pane — inside bslib card)
+   Stats Grid
    -------------------------------------------------------------------------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   Feature Cards (Home tab)
+   -------------------------------------------------------------------------- */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow-md);
+  transform: translateY(-2px);
+}
+
 .feature-card-icon {
   width: 40px;
   height: 40px;
@@ -239,7 +308,20 @@ html, body {
   justify-content: center;
   color: var(--accent);
   font-size: 1rem;
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 /* --------------------------------------------------------------------------
@@ -247,7 +329,7 @@ html, body {
    -------------------------------------------------------------------------- */
 .search-bar-wrap {
   position: relative;
-  margin-bottom: 0;
+  margin-bottom: 1.5rem;
 }
 
 .search-bar-wrap .search-icon {
@@ -261,9 +343,11 @@ html, body {
   z-index: 2;
 }
 
-.search-bar-wrap .form-control { padding-left: 2.5rem; padding-right: 2.5rem; }
+.search-bar-wrap .form-control {
+  padding-left: 2.5rem;
+}
 
-.search-hint-badge {
+.search-hint {
   position: absolute;
   right: 1rem;
   top: 50%;
@@ -281,18 +365,41 @@ html, body {
 /* --------------------------------------------------------------------------
    Filter Panel
    -------------------------------------------------------------------------- */
+.filter-panel-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
 .filter-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0;
+  padding: 0.85rem 1.25rem;
   cursor: pointer;
   user-select: none;
-  border-top: 1px solid var(--border);
-  margin-top: 0.5rem;
+  border-bottom: 1px solid transparent;
+  transition: background 0.15s;
 }
 
-.filter-panel-header:hover { opacity: 0.8; }
+.filter-panel-header:hover {
+  background: var(--surface-2);
+}
+
+.filter-panel-header.open {
+  border-bottom-color: var(--border);
+}
+
+.filter-panel-header h6 {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
 
 .filter-panel-header .chevron {
   color: var(--text-dim);
@@ -300,36 +407,12 @@ html, body {
   transition: transform 0.2s;
 }
 
-.filter-panel-header.open .chevron { transform: rotate(180deg); }
-
-/* --------------------------------------------------------------------------
-   Browse Stats Bar
-   -------------------------------------------------------------------------- */
-.browse-stats-bar {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 0.6rem 0;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+.filter-panel-header.open .chevron {
+  transform: rotate(180deg);
 }
 
-.browse-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-}
-
-.browse-stat-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.browse-stat-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+#filter_panel {
+  padding: 1.25rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -345,11 +428,12 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
+  padding: 1.25rem;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
 .recipe-card:hover {
@@ -357,16 +441,6 @@ html, body {
   box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow-md);
   transform: translateY(-2px);
 }
-
-.recipe-thumb {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
-  border-bottom: 1px solid var(--border);
-}
-
-.recipe-card-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
 
 .recipe-card-header {
   display: flex;
@@ -408,34 +482,17 @@ html, body {
   color: var(--text-muted);
 }
 
-.recipe-meta-item i { font-size: 0.7rem; color: var(--text-dim); }
-
-/* Tags row */
-.recipe-tags-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.recipe-tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 20px;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-}
-
-/* Star rating */
-.recipe-rating {
-  font-size: 0.8rem;
-  color: var(--warning);
-  letter-spacing: 1px;
+.recipe-meta-item i {
+  font-size: 0.7rem;
+  color: var(--text-dim);
 }
 
 /* Match bar */
-.match-bar-wrap { display: flex; align-items: center; gap: 0.6rem; }
+.match-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
 
 .match-bar-track {
   flex: 1;
@@ -464,14 +521,11 @@ html, body {
   text-align: right;
 }
 
-/* Card action bar */
 .recipe-card-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding-top: 0.6rem;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
   border-top: 1px solid var(--border);
-  margin-top: auto;
 }
 
 /* Empty state */
@@ -482,7 +536,11 @@ html, body {
   color: var(--text-muted);
 }
 
-.empty-state i { font-size: 2.5rem; color: var(--text-dim); margin-bottom: 1rem; }
+.empty-state i {
+  font-size: 2.5rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
 
 .empty-state h5 {
   font-size: 1rem;
@@ -491,10 +549,41 @@ html, body {
   margin-bottom: 0.5rem;
 }
 
-.empty-state p { font-size: 0.825rem; color: var(--text-dim); }
+.empty-state p {
+  font-size: 0.825rem;
+  color: var(--text-dim);
+}
 
 /* --------------------------------------------------------------------------
-   Offcanvas Drawer (Recipe Detail)
+   Browse Stats row (compact)
+   -------------------------------------------------------------------------- */
+.browse-stats-bar {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.6rem 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.browse-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.browse-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.browse-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Right-side Offcanvas Drawer (Recipe Detail)
    -------------------------------------------------------------------------- */
 #recipe_detail_drawer {
   background: var(--surface) !important;
@@ -515,22 +604,16 @@ html, body {
   color: var(--text);
 }
 
-#recipe_detail_drawer .btn-close { filter: invert(1) brightness(0.7); }
+#recipe_detail_drawer .btn-close {
+  filter: invert(1) brightness(0.7);
+}
 
 #recipe_detail_drawer .offcanvas-body {
   padding: 1.5rem;
   overflow-y: auto;
 }
 
-.drawer-hero-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  margin-bottom: 1.25rem;
-  border: 1px solid var(--border);
-}
-
+/* Recipe detail content inside drawer */
 .drawer-meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -561,7 +644,9 @@ html, body {
   color: var(--accent);
 }
 
-.drawer-section { margin-bottom: 1.75rem; }
+.drawer-section {
+  margin-bottom: 1.75rem;
+}
 
 .drawer-section-title {
   font-size: 0.78rem;
@@ -575,7 +660,10 @@ html, body {
   gap: 0.5rem;
 }
 
-.drawer-section-title i { color: var(--accent); font-size: 0.75rem; }
+.drawer-section-title i {
+  color: var(--accent);
+  font-size: 0.75rem;
+}
 
 .ingredient-row {
   display: flex;
@@ -587,8 +675,16 @@ html, body {
 }
 
 .ingredient-row:last-child { border-bottom: none; }
-.ingredient-row i { color: var(--success); font-size: 0.7rem; flex-shrink: 0; }
-.ingredient-row.missing i { color: var(--danger); }
+
+.ingredient-row i {
+  color: var(--success);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.ingredient-row.missing i {
+  color: var(--danger);
+}
 
 .step-row {
   display: flex;
@@ -615,12 +711,13 @@ html, body {
   margin-top: 1px;
 }
 
+/* Scale widget inside drawer */
 .scale-widget {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.75rem;
 }
 
 .scale-widget-title {
@@ -631,208 +728,6 @@ html, body {
   color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
-
-.drawer-actions-bar {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-}
-
-/* --------------------------------------------------------------------------
-   Cooking Mode
-   -------------------------------------------------------------------------- */
-.cooking-mode .cooking-wrapper {
-  min-height: calc(100vh - 4rem);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.cooking-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.cooking-recipe-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
-  flex: 1;
-}
-
-.cooking-step-badge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-glow);
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(99,102,241,0.2);
-  white-space: nowrap;
-}
-
-.cooking-progress {
-  height: 6px;
-  background: var(--surface-3);
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.cooking-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 99px;
-  transition: width 0.4s ease;
-}
-
-.cooking-step-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.cooking-step-number {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-dim);
-}
-
-.cooking-step-text {
-  font-size: 1.35rem;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.6;
-}
-
-.cooking-ingredients {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-}
-
-.cooking-ingredients h6 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  margin-bottom: 0.6rem;
-  font-weight: 700;
-}
-
-.cooking-ing-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.cooking-ing-list li {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  background: var(--surface-3);
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-}
-
-.cooking-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.cooking-nav-counter {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-/* --------------------------------------------------------------------------
-   Live Ingredient Preview
-   -------------------------------------------------------------------------- */
-.preview-ingredients-list { display: flex; flex-direction: column; gap: 2px; }
-
-.preview-ingredient-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  font-size: 0.85rem;
-  border: 1px solid var(--border);
-}
-
-.preview-qty {
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 30px;
-}
-
-.preview-unit {
-  color: var(--text-muted);
-  font-style: italic;
-  min-width: 30px;
-}
-
-.preview-name { color: var(--text); }
-
-/* --------------------------------------------------------------------------
-   Inventory Stats
-   -------------------------------------------------------------------------- */
-.inv-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.inv-stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
-.inv-stat-label { font-size: 0.8rem; color: var(--text-muted); }
-
-/* --------------------------------------------------------------------------
-   Settings
-   -------------------------------------------------------------------------- */
-.settings-section-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-}
-
-/* --------------------------------------------------------------------------
-   Shopping List
-   -------------------------------------------------------------------------- */
-.shop-item {
-  display: flex;
-  align-items: center;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
-  gap: 0.5rem;
-}
-
-.shop-item:last-child { border-bottom: none; }
-
-.shop-item.checked label { text-decoration: line-through; color: var(--text-dim); }
-
-.shop-item .checkbox { margin: 0; flex: 1; }
 
 /* --------------------------------------------------------------------------
    Compare Modal
@@ -856,12 +751,21 @@ html, body {
   color: var(--text) !important;
 }
 
-.modal-header .btn-close { filter: invert(1) brightness(0.7) !important; }
-.modal-body { padding: 1.5rem !important; }
-.modal-footer { background: var(--surface-2) !important; border-top: 1px solid var(--border) !important; }
+.modal-header .btn-close {
+  filter: invert(1) brightness(0.7) !important;
+}
+
+.modal-body {
+  padding: 1.5rem !important;
+}
+
+.modal-footer {
+  background: var(--surface-2) !important;
+  border-top: 1px solid var(--border) !important;
+}
 
 /* --------------------------------------------------------------------------
-   Forms & Inputs (dark mode overrides on top of bslib)
+   Forms & Inputs
    -------------------------------------------------------------------------- */
 .form-control,
 .form-select {
@@ -870,6 +774,7 @@ html, body {
   color: var(--text) !important;
   border-radius: var(--radius-sm) !important;
   font-size: 0.875rem !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .form-control:focus,
@@ -881,7 +786,9 @@ html, body {
   outline: none;
 }
 
-.form-control::placeholder { color: var(--text-dim) !important; }
+.form-control::placeholder {
+  color: var(--text-dim) !important;
+}
 
 .form-label,
 label {
@@ -893,26 +800,14 @@ label {
   margin-bottom: 0.4rem;
 }
 
-textarea.form-control { resize: vertical; }
-
-/* selectize.js dark theming */
-.selectize-input, .selectize-dropdown {
-  background: var(--surface-2) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
+textarea.form-control {
+  min-height: 140px;
+  resize: vertical;
 }
 
-.selectize-dropdown .option:hover,
-.selectize-dropdown .active {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
-}
-
-.selectize-input .item {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
-  border: 1px solid rgba(99,102,241,0.25) !important;
-  border-radius: 4px !important;
+/* Shiny textInput/numericInput wrappers */
+.form-group {
+  margin-bottom: 1rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -922,10 +817,14 @@ textarea.form-control { resize: vertical; }
   border-radius: var(--radius-sm) !important;
   font-weight: 600 !important;
   font-size: 0.825rem !important;
+  padding: 0.45rem 1rem !important;
   transition: all 0.15s ease !important;
+  border: 1px solid transparent !important;
 }
 
-.btn:focus { box-shadow: 0 0 0 3px var(--accent-glow) !important; }
+.btn:focus {
+  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+}
 
 .btn-primary {
   background: var(--accent) !important;
@@ -936,6 +835,7 @@ textarea.form-control { resize: vertical; }
 .btn-primary:hover {
   background: var(--accent-dark) !important;
   border-color: var(--accent-dark) !important;
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35) !important;
 }
 
@@ -950,22 +850,60 @@ textarea.form-control { resize: vertical; }
   color: var(--text) !important;
 }
 
-.btn-success  { background: var(--success) !important; border-color: var(--success) !important; color: #fff !important; }
-.btn-danger   { background: var(--danger)  !important; border-color: var(--danger)  !important; color: #fff !important; }
-.btn-warning  { background: var(--warning) !important; border-color: var(--warning) !important; color: #000 !important; }
-.btn-info     { background: var(--info)    !important; border-color: var(--info)    !important; color: #000 !important; }
+.btn-success {
+  background: var(--success) !important;
+  border-color: var(--success) !important;
+  color: #fff !important;
+}
 
-.btn-outline-primary  { background: transparent !important; border-color: var(--accent) !important; color: var(--accent) !important; }
-.btn-outline-primary:hover  { background: var(--accent-glow) !important; }
-.btn-outline-danger   { background: transparent !important; border-color: var(--danger) !important; color: var(--danger) !important; }
-.btn-outline-danger:hover   { background: rgba(239,68,68,0.1) !important; }
-.btn-outline-secondary { background: transparent !important; border-color: var(--border) !important; color: var(--text-muted) !important; }
-.btn-outline-secondary:hover { background: var(--surface-2) !important; color: var(--text) !important; }
+.btn-danger {
+  background: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: #fff !important;
+}
+
+.btn-warning {
+  background: var(--warning) !important;
+  border-color: var(--warning) !important;
+  color: #000 !important;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.7rem !important;
+  font-size: 0.775rem !important;
+}
+
+.btn-lg {
+  padding: 0.65rem 1.5rem !important;
+  font-size: 0.9rem !important;
+}
+
+.btn-outline-primary {
+  background: transparent !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--accent-glow) !important;
+}
+
+.btn-outline-danger {
+  background: transparent !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.btn-outline-danger:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
 
 /* --------------------------------------------------------------------------
-   DT DataTable
+   DT DataTable Dark Theme
    -------------------------------------------------------------------------- */
-.dataTables_wrapper { color: var(--text) !important; }
+.dataTables_wrapper {
+  color: var(--text) !important;
+}
 
 .dataTables_wrapper .dataTable {
   color: var(--text) !important;
@@ -984,8 +922,14 @@ textarea.form-control { resize: vertical; }
   padding: 0.75rem 1rem !important;
 }
 
-.dataTables_wrapper .dataTable tbody tr  { background: var(--surface) !important; }
-.dataTables_wrapper .dataTable tbody tr:hover { background: var(--surface-2) !important; }
+.dataTables_wrapper .dataTable tbody tr {
+  background: var(--surface) !important;
+  transition: background 0.15s;
+}
+
+.dataTables_wrapper .dataTable tbody tr:hover {
+  background: var(--surface-2) !important;
+}
 
 .dataTables_wrapper .dataTable tbody td {
   border-bottom: 1px solid var(--border) !important;
@@ -1031,7 +975,43 @@ textarea.form-control { resize: vertical; }
 }
 
 /* --------------------------------------------------------------------------
-   shinyWidgets PickerInput
+   Panel / Card (generic)
+   -------------------------------------------------------------------------- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-header h5, .panel-header h6 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.panel-header i {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+.panel-body {
+  padding: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   shinyWidgets PickerInput Dark
    -------------------------------------------------------------------------- */
 .bootstrap-select .dropdown-toggle {
   background: var(--surface-2) !important;
@@ -1046,7 +1026,10 @@ textarea.form-control { resize: vertical; }
   border-radius: var(--radius-sm) !important;
 }
 
-.bootstrap-select .dropdown-item { color: var(--text) !important; font-size: 0.85rem !important; }
+.bootstrap-select .dropdown-item {
+  color: var(--text) !important;
+  font-size: 0.85rem !important;
+}
 
 .bootstrap-select .dropdown-item:hover,
 .bootstrap-select .dropdown-item.active {
@@ -1055,7 +1038,7 @@ textarea.form-control { resize: vertical; }
 }
 
 /* --------------------------------------------------------------------------
-   Radio / Checkbox
+   Radio buttons
    -------------------------------------------------------------------------- */
 .radio label, .checkbox label {
   color: var(--text) !important;
@@ -1066,7 +1049,7 @@ textarea.form-control { resize: vertical; }
 }
 
 /* --------------------------------------------------------------------------
-   Shiny Notifications
+   Alerts & Notifications
    -------------------------------------------------------------------------- */
 .shiny-notification {
   background: var(--surface-2) !important;
@@ -1081,78 +1064,40 @@ textarea.form-control { resize: vertical; }
 }
 
 .shiny-notification.shiny-notification-message { border-left-color: var(--success) !important; }
-.shiny-notification.shiny-notification-error   { border-left-color: var(--danger)  !important; }
+.shiny-notification.shiny-notification-error   { border-left-color: var(--danger) !important; }
 .shiny-notification.shiny-notification-warning { border-left-color: var(--warning) !important; }
-.shiny-notification-close { color: var(--text-dim) !important; filter: none !important; }
 
-/* --------------------------------------------------------------------------
-   bslib Accordion
-   -------------------------------------------------------------------------- */
-.accordion-item {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-}
-
-.accordion-button {
-  background: var(--surface-2) !important;
-  color: var(--text) !important;
-  font-weight: 600 !important;
-  font-size: 0.875rem !important;
-}
-
-.accordion-button:not(.collapsed) {
-  background: var(--accent-glow2) !important;
-  color: var(--accent) !important;
-  box-shadow: none !important;
-}
-
-.accordion-button::after { filter: invert(0.6); }
-.accordion-body { background: var(--surface) !important; color: var(--text) !important; }
-
-/* --------------------------------------------------------------------------
-   bslib value_box tweaks
-   -------------------------------------------------------------------------- */
-.bslib-value-box {
-  border-radius: var(--radius) !important;
+.shiny-notification-close {
+  color: var(--text-dim) !important;
+  filter: none !important;
 }
 
 /* --------------------------------------------------------------------------
-   bslib card tweaks
+   Shopping List
    -------------------------------------------------------------------------- */
-.card {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-  border-radius: var(--radius) !important;
-}
-
-.card-header {
-  background: var(--surface-2) !important;
-  border-bottom-color: var(--border) !important;
-  font-weight: 600;
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
-  color: var(--text) !important;
+  color: var(--text);
 }
 
-.card-body { color: var(--text) !important; }
+.shop-item:last-child { border-bottom: none; }
 
 /* --------------------------------------------------------------------------
-   Utility
+   Scrollbar
    -------------------------------------------------------------------------- */
-.text-accent  { color: var(--accent) !important; }
-.text-success { color: var(--success) !important; }
-.text-danger  { color: var(--danger) !important; }
-.text-warning { color: var(--warning) !important; }
-.bg-surface   { background: var(--surface) !important; }
-.divider      { height: 1px; background: var(--border); margin: 1.25rem 0; }
-.settings-section-label { margin-top: 0.25rem; }
-
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
 
-/* Focus ring */
+/* --------------------------------------------------------------------------
+   Focus ring (accessibility)
+   -------------------------------------------------------------------------- */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -1160,14 +1105,54 @@ textarea.form-control { resize: vertical; }
 }
 
 /* --------------------------------------------------------------------------
-   Responsive
+   Utility helpers
+   -------------------------------------------------------------------------- */
+.text-accent  { color: var(--accent) !important; }
+.text-muted   { color: var(--text-muted) !important; }
+.text-success { color: var(--success) !important; }
+.text-danger  { color: var(--danger) !important; }
+.text-warning { color: var(--warning) !important; }
+
+.bg-surface   { background: var(--surface) !important; }
+.bg-surface-2 { background: var(--surface-2) !important; }
+.border-subtle { border-color: var(--border) !important; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.25rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — collapse sidebar on small screens
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .content-pane { padding: 1.25rem 1rem; }
+  #app-sidebar {
+    transform: translateX(-100%);
+  }
 
-  .recipe-cards-grid { grid-template-columns: 1fr; }
+  #app-sidebar.sidebar-open {
+    transform: translateX(0);
+  }
 
-  .browse-stats-bar { gap: 0.75rem; }
+  #main-content {
+    margin-left: 0;
+  }
 
-  .cooking-step-text { font-size: 1.1rem; }
+  .content-pane {
+    padding: 1.25rem 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .recipe-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .browse-stats-bar {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 }

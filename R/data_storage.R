@@ -43,14 +43,23 @@ save_db <- function(db) {
 get_shopping_list <- function() {
   f <- shopping_file()
   if (!file.exists(f)) {
-    return(character())
+    return(list())
   }
-  readRDS(f)
+  raw <- tryCatch(readRDS(f), error = function(e) list())
+  # Migrate old character-vector format to list-of-items format
+  if (is.character(raw)) {
+    return(lapply(raw, function(x) list(text = x, checked = FALSE)))
+  }
+  raw
 }
 
 save_shopping_list <- function(items) {
   f <- shopping_file()
-  saveRDS(as.character(items), f)
+  # Accept legacy character vector; normalise to list format before saving
+  if (is.character(items)) {
+    items <- lapply(items, function(x) list(text = x, checked = FALSE))
+  }
+  saveRDS(items, f)
   invisible(TRUE)
 }
 
