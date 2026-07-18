@@ -2037,6 +2037,12 @@
       "BugReports": "https://github.com/vubiostat/r-yaml/issues",
       "NeedsCompilation": "yes",
       "Repository": "CRAN"
+    },
+    "devtools": {
+      "Version": "2.5.2"
+    },
+    "testthat": {
+      "Version": "3.3.2"
     }
   }
 }
