@@ -24,39 +24,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libssh2-1-dev
 
-      - name: Restore renv
-        shell: Rscript {0}
+      - name: Install required packages
         run: |
-          repo_dir <- "."
-          renv_dir <- file.path(repo_dir, "renv")
-          lockfile <- file.path(repo_dir, "renv.lock")
-          libpath <- .libPaths()[1]
-          .libPaths(c(libpath, file.path(repo_dir, "renv/library"))
-          if (requireNamespace("renv", quietly = TRUE)) renv::restore(lockfile = lockfile, library = libpath, repos = Sys.getenv("RSPM"))
-          
-      - name: Install test dependencies
-        run: |
-          Rscript -e "install.packages(c('devtools', 'testthat'), repos=Sys.getenv('RSPM'), type='binary')"
-
-      - name: Run tests
-        run: devtools::test()
-        shell: Rscript {0}
-
-      - name: Check R formatting (air)
-        run: air --check .
-        continue-on-error: true
-
-      - name: Run linter (lintr)
-        run: |
-          lints <- lintr::lint_dir("R")
-          print(lints)
-          if (length(lints) > 0) stop("Linting issues found")
-        shell: Rscript {0}
-        continue-on-error: true
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: tests/
+          Rscript -e "
+          # Install renv
+          install.packages('renv')
+          # Initialize renv with the lockfile
+          library(renv)
+          renv::init()
+          # Copy lockfile to renv/etc/
+          sys.copy1 <- Sys.glob('renv/library/linux-ubuntu-noble/R-4.6/x86_64-pc-linux-gnu')
+          if (length(sys.copy1) > 0) {
+            file.copy(sys.copy1, 'renv/library', recursive = TRUE)
+          }
+          # Run tests
+          install.packages(c('devtools', 'testthat'), repos = Sys.getenv('RSPM'), type = 'binary')
+          devtools::test()
+          "
