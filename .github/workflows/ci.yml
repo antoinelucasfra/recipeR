@@ -24,14 +24,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libssh2-1-dev
 
-      - name: Setup renv (bypass cache for R 4.6.1 compatibility)
-        uses: r-lib/actions/setup-renv@v2
-        with:
-          bypass-cache: true
-          cache-version: 2
-        env:
-          RENV_CONFIG_REPOS_OVERRIDE: https://packagemanager.posit.co/cran/__linux__/noble/latest
-
+      - name: Restore renv
+        shell: Rscript {0}
+        run: |
+          repo_dir <- "."
+          renv_dir <- file.path(repo_dir, "renv")
+          lockfile <- file.path(repo_dir, "renv.lock")
+          libpath <- .libPaths()[1]
+          .libPaths(c(libpath, file.path(repo_dir, "renv/library"))
+          if (requireNamespace("renv", quietly = TRUE)) renv::restore(lockfile = lockfile, library = libpath, repos = Sys.getenv("RSPM"))
+          
       - name: Install test dependencies
         run: |
           Rscript -e "install.packages(c('devtools', 'testthat'), repos=Sys.getenv('RSPM'), type='binary')"
