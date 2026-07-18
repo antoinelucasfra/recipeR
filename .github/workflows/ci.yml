@@ -23,21 +23,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libssh2-1-dev
+          sudo apt-get install -y libgdal-dev libproj-dev libgeos-dev
 
       - name: Install required packages
         run: |
           Rscript -e "
           # Install renv
-          install.packages('renv')
-          # Initialize renv with the lockfile
+          install.packages('renv', repos = Sys.getenv('RSPM'), type = 'binary')
+          # Restore packages from lockfile
           library(renv)
-          renv::init()
-          # Copy lockfile to renv/etc/
-          sys.copy1 <- Sys.glob('renv/library/linux-ubuntu-noble/R-4.6/x86_64-pc-linux-gnu')
-          if (length(sys.copy1) > 0) {
-            file.copy(sys.copy1, 'renv/library', recursive = TRUE)
-          }
-          # Run tests
+          renv::restore(confirm = FALSE)
+          # Install test dependencies
           install.packages(c('devtools', 'testthat'), repos = Sys.getenv('RSPM'), type = 'binary')
+          # Run tests
           devtools::test()
           "
