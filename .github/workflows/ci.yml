@@ -30,9 +30,9 @@ jobs:
           Rscript -e "
           # Install renv
           install.packages('renv', repos = Sys.getenv('RSPM'), type = 'binary')
-          # Restore packages from lockfile
+          # Restore packages from lockfile (skip load test for R 4.6.1 compatibility)
           library(renv)
-          renv::restore(confirm = FALSE)
+          renv::restore(confirm = FALSE, check = FALSE)
           # Install test dependencies
           install.packages(c('devtools', 'testthat'), repos = Sys.getenv('RSPM'), type = 'binary')
           # Run tests
