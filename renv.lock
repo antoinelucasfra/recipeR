@@ -449,6 +449,9 @@
       "Author": "Gábor Csárdi [aut, cre], Kirill Müller [aut], Jim Hester [aut], Maëlle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>), Posit Software, PBC [cph, fnd]",
       "Repository": "RSPM"
     },
+    "devtools": {
+      "Version": "2.5.2"
+    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.39",
@@ -1822,6 +1825,12 @@
       "Maintainer": "Victor Perrier <victor.perrier@dreamrs.fr>",
       "Repository": "CRAN"
     },
+    "shinyglass": {
+      "Package": "shinyglass",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN"
+    },
     "shinyjs": {
       "Package": "shinyjs",
       "Version": "2.1.1",
@@ -1877,6 +1886,9 @@
       "Encoding": "UTF-8",
       "NeedsCompilation": "yes",
       "Repository": "RSPM"
+    },
+    "testthat": {
+      "Version": "3.3.2"
     },
     "tinytex": {
       "Package": "tinytex",
@@ -2037,12 +2049,6 @@
       "BugReports": "https://github.com/vubiostat/r-yaml/issues",
       "NeedsCompilation": "yes",
       "Repository": "CRAN"
-    },
-    "devtools": {
-      "Version": "2.5.2"
-    },
-    "testthat": {
-      "Version": "3.3.2"
     }
   }
 }

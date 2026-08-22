@@ -4,16 +4,17 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   CSS Custom Properties — respond to bslib input_dark_mode() toggle
+   CSS Custom Properties — mapped onto shinyglass Liquid Glass tokens
+   (--glass-* switch automatically with [data-bs-theme] light/dark/auto)
    -------------------------------------------------------------------------- */
 :root,
 [data-bs-theme="dark"] {
-  --bg:           #0f1117;
-  --surface:      #1a1d27;
-  --surface-2:    #22263a;
-  --surface-3:    #2a2d3e;
-  --border:       #2e3347;
-  --border-light: #3a3f57;
+  --bg:           transparent;
+  --surface:      var(--glass-bg-content);
+  --surface-2:    var(--glass-bg-hover);
+  --surface-3:    var(--glass-bg-hover);
+  --border:       var(--glass-border);
+  --border-light: var(--glass-rim);
   --accent:       #6366f1;
   --accent-dark:  #4f52d4;
   --accent-glow:  rgba(99, 102, 241, 0.18);
@@ -33,12 +34,12 @@
 }
 
 [data-bs-theme="light"] {
-  --bg:           #f8fafc;
-  --surface:      #ffffff;
-  --surface-2:    #f1f5f9;
-  --surface-3:    #e2e8f0;
-  --border:       #e2e8f0;
-  --border-light: #cbd5e1;
+  --bg:           transparent;
+  --surface:      var(--glass-bg-content);
+  --surface-2:    var(--glass-bg-hover);
+  --surface-3:    var(--glass-bg-hover);
+  --border:       var(--glass-border);
+  --border-light: var(--glass-rim);
   --accent:       #4f46e5;
   --accent-dark:  #4338ca;
   --accent-glow:  rgba(79, 70, 229, 0.12);
@@ -52,6 +53,16 @@
   --text-dim:   #94a3b8;
 }
 
+/* Glass material for the surfaces recipeR styles itself */
+.bslib-sidebar-layout > .sidebar,
+.card,
+.value-box,
+.modal-content,
+.accordion-item {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
 /* --------------------------------------------------------------------------
    Reset & Base
    -------------------------------------------------------------------------- */
@@ -59,13 +70,14 @@
 
 html, body {
   height: 100%;
-  background: var(--bg);
+  background: var(--glass-page-bg);
+  color: var(--glass-body-color);
   -webkit-font-smoothing: antialiased;
 }
 
-/* bslib page_sidebar shell overrides */
+/* bslib page_sidebar shell — let the glass page background show through */
 .bslib-page-sidebar {
-  background: var(--bg) !important;
+  background: transparent !important;
 }
 
 .container-fluid { padding: 0 !important; }

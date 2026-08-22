@@ -23,17 +23,23 @@ app_server <- function(input, output, session) {
 
   refresh_data()
 
-  # Theme toggle (sidebar widget, outside any module)
-  observeEvent(input$color_mode, {
-    if (input$color_mode == "light") {
-      session$setCurrentTheme(app_theme("light"))
-    } else {
-      session$setCurrentTheme(app_theme("dark"))
+  # Theme toggle (sidebar widget, outside any module) — shinyglass light/dark/auto
+  shinyglass::observe_glass_theme_toggle(input, session, inputId = "color_mode")
+  observeEvent(
+    c(input$color_mode_light, input$color_mode_dark, input$color_mode_auto),
+    {
+      mode <- if (isTRUE(input$color_mode_light)) {
+        "light"
+      } else if (isTRUE(input$color_mode_dark)) {
+        "dark"
+      } else {
+        "auto"
+      }
+      prefs <- get_prefs()
+      prefs$color_mode <- mode
+      save_prefs(prefs)
     }
-    prefs <- get_prefs()
-    prefs$color_mode <- input$color_mode
-    save_prefs(prefs)
-  })
+  )
 
   mod_home_server("home", rv)
   mod_browse_server("browse", rv, refresh_data)
