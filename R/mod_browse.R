@@ -36,7 +36,7 @@ mod_browse_ui <- function(id) {
             tags$i(class = "fas fa-magnifying-glass search-icon"),
             textInput(
               ns("search_query"),
-              NULL,
+              tags$span("Search recipes", class = "visually-hidden"),
               placeholder = "Search recipes...",
               width = "100%"
             ),
@@ -45,6 +45,10 @@ mod_browse_ui <- function(id) {
           tags$div(
             id = "filter-panel-header",
             class = "filter-panel-header mt-2",
+            role = "button",
+            tabindex = "0",
+            `aria-expanded` = "false",
+            `aria-controls` = "filter_panel",
             tags$span(
               tags$i(
                 class = "fas fa-sliders",
@@ -64,7 +68,7 @@ mod_browse_ui <- function(id) {
           ),
           tags$div(
             id = "filter_panel",
-            style = "display:none;padding-top:0.75rem;",
+            style = "padding-top:0.75rem;",
             bslib::layout_columns(
               col_widths = c(6, 6),
               tags$div(
@@ -134,13 +138,9 @@ mod_browse_ui <- function(id) {
             class = "browse-stat-value",
             textOutput(ns("browse_avg_steps"), inline = TRUE)
           ),
-          tags$span(class = "browse-stat-label", "avg steps")
-        ),
-        tags$div(
-          style = "margin-left:auto;",
           selectInput(
             ns("browse_sort"),
-            NULL,
+            tags$span("Sort recipes", class = "visually-hidden"),
             choices = c(
               "Best Match" = "match",
               "Title A->Z" = "title",
@@ -149,7 +149,7 @@ mod_browse_ui <- function(id) {
             ),
             selected = "match",
             width = "160px"
-          )
+          ),
         )
       ),
 
@@ -188,6 +188,8 @@ mod_browse_ui <- function(id) {
       class = "modal fade",
       tabindex = "-1",
       role = "dialog",
+      `aria-modal` = "true",
+      `aria-labelledby` = "compare_modal_title",
       tags$div(
         class = "modal-dialog modal-xl",
         role = "document",
@@ -195,7 +197,11 @@ mod_browse_ui <- function(id) {
           class = "modal-content",
           tags$div(
             class = "modal-header",
-            tags$h5(class = "modal-title", "Compare Recipes"),
+            tags$h5(
+              class = "modal-title",
+              id = "compare_modal_title",
+              "Compare Recipes"
+            ),
             tags$button(
               type = "button",
               class = "btn-close",
@@ -203,7 +209,10 @@ mod_browse_ui <- function(id) {
               `aria-label` = "Close"
             )
           ),
-          tags$div(class = "modal-body", uiOutput(ns("recipe_compare_content"))),
+          tags$div(
+            class = "modal-body",
+            uiOutput(ns("recipe_compare_content"))
+          ),
           tags$div(
             class = "modal-footer",
             tags$button(
@@ -226,22 +235,6 @@ mod_browse_server <- function(id, rv, refresh_data) {
 
     selected_recipe <- reactiveVal(NULL)
     drawer_scale <- reactiveVal(1)
-
-    parse_ingredients_raw <- function(text) {
-      lines <- unlist(strsplit(as.character(text), "[\\r\\n]+"))
-      lines <- trimws(lines)
-      lines <- lines[nzchar(lines)]
-      lapply(seq_along(lines), function(i) {
-        parsed <- parse_ingredient_line(lines[i])
-        list(
-          ingredient_name = parsed$name,
-          raw_text = parsed$raw,
-          quantity = parsed$quantity,
-          unit = parsed$unit,
-          is_optional = FALSE
-        )
-      })
-    }
 
     filtered_recipes <- reactive({
       recs <- rv$recipes
@@ -286,25 +279,26 @@ mod_browse_server <- function(id, rv, refresh_data) {
 
     output$browse_avg_ingredients <- renderText({
       recs <- filtered_recipes()
-      if (length(recs) == 0) return("0")
+      if (length(recs) == 0) {
+        return("0")
+      }
       round(mean(sapply(recs, function(r) length(r$ingredients))), 1)
     })
 
     output$browse_avg_steps <- renderText({
       recs <- filtered_recipes()
-      if (length(recs) == 0) return("0")
+      if (length(recs) == 0) {
+        return("0")
+      }
       round(mean(sapply(recs, function(r) length(r$instructions))), 1)
     })
 
     output$browse_cuisines_count <- renderText({
       recs <- filtered_recipes()
-      if (length(recs) == 0) return("0")
+      if (length(recs) == 0) {
+        return("0")
+      }
       length(unique(sapply(recs, function(r) r$source)))
-    })
-
-    # Filter panel toggle (dead code — panel is toggled via JS class, but kept for completeness)
-    observeEvent(input$toggle_filters, {
-      shinyjs::toggle("filter_panel")
     })
 
     # Populate cuisine/source filters from recipes
@@ -314,35 +308,41 @@ mod_browse_server <- function(id, rv, refresh_data) {
         cuisines <- sort(unique(sapply(rv$recipes, function(r) {
           if (!is.null(r$source) && nzchar(r$source)) r$source else "Unknown"
         })))
-        shinyWidgets::updatePickerInput(session, "cuisine_filter", choices = cuisines)
+        shinyWidgets::updatePickerInput(
+          session,
+          "cuisine_filter",
+          choices = cuisines
+        )
 
         sources <- unique(sapply(rv$recipes, function(r) r$source_url %||% ""))
         sources <- sort(sources[nzchar(sources)])
-        shinyWidgets::updatePickerInput(session, "source_filter", choices = sources)
+        shinyWidgets::updatePickerInput(
+          session,
+          "source_filter",
+          choices = sources
+        )
       },
       ignoreInit = TRUE
     )
 
     observeEvent(input$reset_filters, {
-      shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = character(0))
-      shinyWidgets::updatePickerInput(session, "source_filter", selected = character(0))
+      shinyWidgets::updatePickerInput(
+        session,
+        "cuisine_filter",
+        selected = character(0)
+      )
+      shinyWidgets::updatePickerInput(
+        session,
+        "source_filter",
+        selected = character(0)
+      )
       updateTextInput(session, "search_query", value = "")
-      showNotification("Filters reset", type = "message")
-    })
-
-    observeEvent(input$select_all_filters, {
-      all_cuisines <- sort(unique(sapply(rv$recipes, function(r) {
-        if (!is.null(r$source) && nzchar(r$source)) r$source else "Unknown"
-      })))
-      shinyWidgets::updatePickerInput(session, "cuisine_filter", selected = all_cuisines)
-      showNotification("All cuisines selected", type = "message")
     })
 
     output$recipe_cards_grid <- renderUI({
       recs <- filtered_recipes()
       inv <- rv$ingredients
       sel_ids <- rv$selected_card_ids
-
       if (length(recs) == 0) {
         return(tags$div(
           class = "recipe-cards-grid",
@@ -392,7 +392,10 @@ mod_browse_server <- function(id, rv, refresh_data) {
             tags$div(
               class = "recipe-card-title",
               if (isTRUE(r$is_favorite)) {
-                tags$i(class = "fas fa-heart", style = "color:#ef4444;margin-right:0.3rem;")
+                tags$i(
+                  class = "fas fa-heart",
+                  style = "color:#ef4444;margin-right:0.3rem;"
+                )
               },
               r$title
             ),
@@ -462,13 +465,15 @@ mod_browse_server <- function(id, rv, refresh_data) {
               tags$i(class = "fas fa-trash"),
               class = "btn btn-danger btn-sm",
               title = "Delete",
+              `aria-label` = "Delete recipe",
               `data-bs-toggle` = "tooltip"
             ),
             actionButton(
               ns(paste0("dup_", rid)),
               icon("copy"),
               class = "btn btn-secondary btn-sm",
-              title = "Duplicate"
+              title = "Duplicate",
+              `aria-label` = "Duplicate recipe"
             ),
             if (length(r$instructions) > 0) {
               actionButton(
@@ -508,27 +513,38 @@ mod_browse_server <- function(id, rv, refresh_data) {
       r1 <- rv$recipes[[sel_ids[1]]]
       r2 <- rv$recipes[[sel_ids[2]]]
       if (is.null(r1) || is.null(r2)) {
-        showNotification("One or both selected recipes not found.", type = "error")
+        showNotification(
+          "One or both selected recipes not found.",
+          type = "error"
+        )
         return()
       }
       rv$compare_pair <- list(r1, r2)
-      shinyjs::runjs(
-        paste0(
-          "(function(){",
-          "var el=document.getElementById('recipe_compare_modal');",
-          "if(el){var m=bootstrap.Modal.getInstance(el)||new bootstrap.Modal(el);",
-          "m.show();}",
-          "})()"
+      session$sendCustomMessage(
+        "runjs",
+        list(
+          code = paste0(
+            "(function(){",
+            "var el=document.getElementById('recipe_compare_modal');",
+            "if(el){var m=bootstrap.Modal.getInstance(el)||new bootstrap.Modal(el);",
+            "m.show();}",
+            "})()"
+          )
         )
       )
     })
 
     output$drawer_title <- renderUI({
       r <- selected_recipe()
-      if (is.null(r)) return(NULL)
+      if (is.null(r)) {
+        return(NULL)
+      }
       if (isTRUE(r$is_favorite)) {
         tagList(
-          tags$i(class = "fas fa-heart", style = "color:#ef4444;margin-right:0.4rem;"),
+          tags$i(
+            class = "fas fa-heart",
+            style = "color:#ef4444;margin-right:0.4rem;"
+          ),
           r$title
         )
       } else {
@@ -561,29 +577,24 @@ mod_browse_server <- function(id, rv, refresh_data) {
 
       scaled_ings <- lapply(seq_along(r$ingredients), function(idx) {
         i <- r$ingredients[[idx]]
-        orig_qty <- if (!is.null(i$quantity) && !is.na(i$quantity)) i$quantity else NA_real_
-        orig_unit <- if (!is.null(i$unit) && !is.na(i$unit)) i$unit else NA_character_
+        orig_qty <- if (!is.null(i$quantity) && !is.na(i$quantity)) {
+          i$quantity
+        } else {
+          NA_real_
+        }
+        orig_unit <- if (!is.null(i$unit) && !is.na(i$unit)) {
+          i$unit
+        } else {
+          NA_character_
+        }
         if (!is.na(orig_qty)) {
           new_qty <- as.numeric(orig_qty) * mult
-          conv <- tryCatch(
-            convert_with_density(
-              new_qty,
-              orig_unit,
-              target_system = sys,
-              ingredient_name = i$ingredient_name
-            ),
-            error = function(e) {
-              list(quantity = new_qty, unit = orig_unit, display = NA_character_)
-            }
-          )
-          display <- if (!is.null(conv$display) && !is.na(conv$display)) {
-            conv$display
+          m <- unit_to_metric(new_qty, orig_unit)
+          if (m$type %in% c("volume", "mass")) {
+            p <- metric_to_preferred(m$amount, m$type, sys)
+            display <- paste0(p$quantity, " ", p$unit)
           } else {
-            paste(
-              format(conv$quantity, digits = 3),
-              conv$unit %||% "",
-              i$ingredient_name
-            )
+            display <- paste0(format(new_qty, digits = 3), " ", orig_unit)
           }
         } else {
           display <- if (!is.null(i$raw_text) && nzchar(i$raw_text)) {
@@ -597,8 +608,13 @@ mod_browse_server <- function(id, rv, refresh_data) {
 
       ing_rows <- lapply(scaled_ings, function(si) {
         tags$div(
-          class = paste("ingredient-row", if (isTRUE(si$missing)) "missing" else ""),
-          tags$i(class = if (isTRUE(si$missing)) "fas fa-xmark" else "fas fa-check"),
+          class = paste(
+            "ingredient-row",
+            if (isTRUE(si$missing)) "missing" else ""
+          ),
+          tags$i(
+            class = if (isTRUE(si$missing)) "fas fa-xmark" else "fas fa-check"
+          ),
           si$display
         )
       })
@@ -664,7 +680,10 @@ mod_browse_server <- function(id, rv, refresh_data) {
             style = "display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;",
             numericInput(
               ns(scale_input_id),
-              NULL,
+              tags$span(
+                "Scale recipe by number of servings",
+                class = "visually-hidden"
+              ),
               value = mult,
               min = 0.25,
               step = 0.25,
@@ -677,7 +696,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
             ),
             selectInput(
               ns(paste0("drawer_rating_", rid)),
-              NULL,
+              tags$span("Rating", class = "visually-hidden"),
               choices = c(
                 "No rating" = "",
                 "1 star" = "1",
@@ -758,7 +777,11 @@ mod_browse_server <- function(id, rv, refresh_data) {
       make_col <- function(r) {
         ings <- lapply(r$ingredients, function(i) {
           tags$li(
-            if (!is.null(i$raw_text) && nzchar(i$raw_text)) i$raw_text else i$ingredient_name
+            if (!is.null(i$raw_text) && nzchar(i$raw_text)) {
+              i$raw_text
+            } else {
+              i$ingredient_name
+            }
           )
         })
         inst <- lapply(r$instructions, function(s) tags$li(s$instruction_text))
@@ -810,6 +833,7 @@ mod_browse_server <- function(id, rv, refresh_data) {
 
       fluidRow(make_col(pair[[1]]), make_col(pair[[2]]))
     })
+    outputOptions(output, "recipe_compare_content", suspendWhenHidden = FALSE)
 
     # Per-recipe observers — registered once per new recipe ID
     observe({
@@ -820,7 +844,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
         session$userData$registered_recipe_ids <- registered
       }
       new_ids <- setdiff(ids, registered)
-      if (length(new_ids) == 0) return()
+      if (length(new_ids) == 0) {
+        return()
+      }
 
       lapply(new_ids, function(rid) {
         btn <- paste0("view_", rid)
@@ -841,18 +867,23 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[btn]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               drawer_scale(1)
               selected_recipe(r)
-              shinyjs::runjs(
-                paste0(
-                  "(function(){",
-                  "var el=document.getElementById('recipe_detail_drawer');",
-                  "if(el){",
-                  "var oc=bootstrap.Offcanvas.getInstance(el)||new bootstrap.Offcanvas(el);",
-                  "oc.show();",
-                  "}",
-                  "})()"
+              session$sendCustomMessage(
+                "runjs",
+                list(
+                  code = paste0(
+                    "(function(){",
+                    "var el=document.getElementById('recipe_detail_drawer');",
+                    "if(el){",
+                    "var oc=bootstrap.Offcanvas.getInstance(el)||new bootstrap.Offcanvas(el);",
+                    "oc.show();",
+                    "}",
+                    "})()"
+                  )
                 )
               )
             },
@@ -874,7 +905,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[addshop_btn]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               missing_to_add <- get_missing_ingredients(r, rv$ingredients)
               if (length(missing_to_add) == 0) {
                 showNotification(
@@ -893,7 +926,10 @@ mod_browse_server <- function(id, rv, refresh_data) {
               save_shopping_list(combined)
               rv$shopping <- combined
               showNotification(
-                sprintf("Added %d item(s) to shopping list", length(missing_to_add)),
+                sprintf(
+                  "Added %d item(s) to shopping list",
+                  length(missing_to_add)
+                ),
                 type = "message"
               )
             },
@@ -924,7 +960,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[inp_rating]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               rating_val <- input[[inp_rating]]
               r$rating <- if (!is.null(rating_val) && nzchar(rating_val)) {
                 as.integer(rating_val)
@@ -941,7 +979,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[btn_fav]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               r$is_favorite <- !isTRUE(r$is_favorite)
               update_recipe(id_now, r)
               refresh_data()
@@ -954,7 +994,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[btn_dup]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               r_copy <- r
               r_copy$title <- paste0(r$title, " (copy)")
               r_copy$recipe_id <- NULL
@@ -972,16 +1014,24 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[btn_cook]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               rv$cooking_recipe <- r
               rv$cooking_step <- 1L
-              shinyjs::runjs("window.recipeR_navigate('cooking')")
-              shinyjs::runjs(
-                paste0(
-                  "(function(){",
-                  "var el=document.getElementById('recipe_detail_drawer');",
-                  "if(el){var oc=bootstrap.Offcanvas.getInstance(el);if(oc)oc.hide();}",
-                  "})()"
+              session$sendCustomMessage(
+                "runjs",
+                list(code = "window.recipeR_navigate('cooking')")
+              )
+              session$sendCustomMessage(
+                "runjs",
+                list(
+                  code = paste0(
+                    "(function(){",
+                    "var el=document.getElementById('recipe_detail_drawer');",
+                    "if(el){var oc=bootstrap.Offcanvas.getInstance(el);if(oc)oc.hide();}",
+                    "})()"
+                  )
                 )
               )
             },
@@ -992,7 +1042,9 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[editbtn]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               ing_text <- paste(
                 sapply(r$ingredients, function(i) {
                   if (!is.null(i$raw_text)) i$raw_text else i$ingredient_name
@@ -1007,8 +1059,16 @@ mod_browse_server <- function(id, rv, refresh_data) {
               showModal(modalDialog(
                 title = paste0("Edit: ", r$title),
                 textInput(ns("edit_title"), "Title", value = r$title),
-                textInput(ns("edit_source"), "Cuisine/Source", value = r$source),
-                textInput(ns("edit_source_url"), "Source URL", value = r$source_url %||% ""),
+                textInput(
+                  ns("edit_source"),
+                  "Cuisine/Source",
+                  value = r$source
+                ),
+                textInput(
+                  ns("edit_source_url"),
+                  "Source URL",
+                  value = r$source_url %||% ""
+                ),
                 textAreaInput(
                   ns("edit_ingredients"),
                   "Ingredients (one per line)",
@@ -1041,13 +1101,23 @@ mod_browse_server <- function(id, rv, refresh_data) {
                   updated <- r
                   updated$title <- new_title
                   updated$source <- input$edit_source
-                  updated$source_url <- if (nzchar(new_src_url)) new_src_url else NULL
+                  updated$source_url <- if (nzchar(new_src_url)) {
+                    new_src_url
+                  } else {
+                    NULL
+                  }
                   updated$ingredients <- new_ings
-                  updated$instructions <- lapply(seq_along(inst_lines), function(i) {
-                    list(step_number = i, instruction_text = inst_lines[i])
-                  })
+                  updated$instructions <- lapply(
+                    seq_along(inst_lines),
+                    function(i) {
+                      list(step_number = i, instruction_text = inst_lines[i])
+                    }
+                  )
                   update_recipe(id_now, updated)
-                  showNotification(sprintf("Updated '%s'", new_title), type = "message")
+                  showNotification(
+                    sprintf("Updated '%s'", new_title),
+                    type = "message"
+                  )
                   refresh_data()
                   removeModal()
                 },
@@ -1061,13 +1131,19 @@ mod_browse_server <- function(id, rv, refresh_data) {
             input[[delbtn]],
             {
               r <- rv$recipes[[id_now]]
-              if (is.null(r)) return()
+              if (is.null(r)) {
+                return()
+              }
               showModal(modalDialog(
                 title = paste0("Delete: ", r$title),
                 p("Are you sure you want to delete this recipe?"),
                 footer = tagList(
                   modalButton("Cancel"),
-                  actionButton(ns("confirm_delete"), "Delete", class = "btn-danger")
+                  actionButton(
+                    ns("confirm_delete"),
+                    "Delete",
+                    class = "btn-danger"
+                  )
                 )
               ))
               observeEvent(

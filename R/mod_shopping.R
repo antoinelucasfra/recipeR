@@ -26,7 +26,7 @@ mod_shopping_ui <- function(id) {
               style = "display:flex;gap:0.5rem;",
               textInput(
                 ns("new_shop_item"),
-                NULL,
+                tags$span("New shopping list item", class = "visually-hidden"),
                 placeholder = "e.g., 2 cups flour",
                 width = "100%"
               ),
@@ -114,7 +114,8 @@ mod_shopping_server <- function(id, rv) {
             NULL,
             icon = icon("times"),
             class = "btn btn-sm btn-outline-danger ms-2",
-            title = "Remove"
+            title = "Remove",
+            `aria-label` = "Remove item"
           )
         )
       })

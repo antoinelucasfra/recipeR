@@ -43,10 +43,18 @@ mod_add_ui <- function(id) {
               width = "100%"
             )
           ),
-          textInput(ns("new_source_url"), "Source URL (optional)", width = "100%"),
-          textInput(ns("new_image_url"), "Image URL (optional)", width = "100%"),
+          textInput(
+            ns("new_source_url"),
+            "Source URL (optional)",
+            width = "100%"
+          ),
+          textInput(
+            ns("new_image_url"),
+            "Image URL (optional)",
+            width = "100%"
+          ),
           tags$div(
-            tags$label("Tags"),
+            tags$label("Tags", `for` = ns("new_tags")),
             tags$small(
               class = "text-muted d-block mb-1",
               "Press Enter or comma after each tag"
@@ -65,7 +73,11 @@ mod_add_ui <- function(id) {
               width = "100%"
             )
           ),
-          tags$label("Ingredients", style = "margin-top:0.5rem;"),
+          tags$label(
+            "Ingredients",
+            `for` = ns("new_ingredients_raw"),
+            style = "margin-top:0.5rem;"
+          ),
           tags$small(
             class = "text-muted d-block mb-1",
             'One per line -- e.g. "1 1/2 cups flour"'
@@ -77,7 +89,11 @@ mod_add_ui <- function(id) {
             rows = 6,
             width = "100%"
           ),
-          tags$label("Instructions", style = "margin-top:0.5rem;"),
+          tags$label(
+            "Instructions",
+            `for` = ns("new_instructions"),
+            style = "margin-top:0.5rem;"
+          ),
           tags$small(class = "text-muted d-block mb-1", "One step per line"),
           textAreaInput(
             ns("new_instructions"),
@@ -118,22 +134,6 @@ mod_add_ui <- function(id) {
 #' @noRd
 mod_add_server <- function(id, rv, refresh_data) {
   moduleServer(id, function(input, output, session) {
-    parse_ingredients_raw <- function(text) {
-      lines <- unlist(strsplit(as.character(text), "[\\r\\n]+"))
-      lines <- trimws(lines)
-      lines <- lines[nzchar(lines)]
-      lapply(seq_along(lines), function(i) {
-        parsed <- parse_ingredient_line(lines[i])
-        list(
-          ingredient_name = parsed$name,
-          raw_text = parsed$raw,
-          quantity = parsed$quantity,
-          unit = parsed$unit,
-          is_optional = FALSE
-        )
-      })
-    }
-
     output$ingredient_preview <- renderUI({
       raw <- input$new_ingredients_raw
       if (is.null(raw) || !nzchar(trimws(raw))) {
@@ -152,8 +152,16 @@ mod_add_server <- function(id, rv, refresh_data) {
       }
       rows <- lapply(lines, function(line) {
         p <- parse_ingredient_line(line)
-        qty_str <- if (!is.null(p$quantity) && !is.na(p$quantity)) as.character(p$quantity) else ""
-        unit_str <- if (!is.null(p$unit) && !is.na(p$unit) && nzchar(p$unit)) p$unit else ""
+        qty_str <- if (!is.null(p$quantity) && !is.na(p$quantity)) {
+          as.character(p$quantity)
+        } else {
+          ""
+        }
+        unit_str <- if (!is.null(p$unit) && !is.na(p$unit) && nzchar(p$unit)) {
+          p$unit
+        } else {
+          ""
+        }
         name_str <- if (!is.null(p$name) && nzchar(p$name)) p$name else ""
         tags$div(
           class = "preview-ingredient-row",
@@ -202,7 +210,10 @@ mod_add_server <- function(id, rv, refresh_data) {
         last_modified = Sys.time()
       )
       added <- add_recipe(recipe)
-      showNotification(sprintf("Saved recipe '%s'", added$title), type = "message")
+      showNotification(
+        sprintf("Saved recipe '%s'", added$title),
+        type = "message"
+      )
       updateTextInput(session, "new_title", value = "")
       updateTextInput(session, "new_source", value = "")
       updateTextInput(session, "new_source_url", value = "")

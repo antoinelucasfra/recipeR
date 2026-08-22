@@ -7,9 +7,10 @@
 # ---------------------------------------------------------------------------
 
 #' @noRd
-app_theme_dark <- function() {
-  bslib::bs_theme(
-    version = 5,
+app_theme <- function(mode = c("dark", "light")) {
+  mode <- match.arg(mode)
+  is_dark <- identical(mode, "dark")
+  dark <- list(
     bg = "#0f1117",
     fg = "#e2e8f0",
     primary = "#6366f1",
@@ -18,7 +19,6 @@ app_theme_dark <- function() {
     warning = "#f59e0b",
     danger = "#ef4444",
     info = "#38bdf8",
-    "font-size-base" = "0.875rem",
     "card-bg" = "#1a1d27",
     "card-border-color" = "#2e3347",
     "card-cap-bg" = "#22263a",
@@ -37,17 +37,9 @@ app_theme_dark <- function() {
     "offcanvas-border-color" = "#2e3347",
     "dropdown-bg" = "#1a1d27",
     "dropdown-border-color" = "#2e3347",
-    "table-color" = "#e2e8f0",
-    "table-bg" = "transparent",
-    "table-striped-bg" = "rgba(99,102,241,0.05)",
-    base_font = bslib::font_google("Inter")
+    "table-color" = "#e2e8f0"
   )
-}
-
-#' @noRd
-app_theme_light <- function() {
-  bslib::bs_theme(
-    version = 5,
+  light <- list(
     bg = "#f8fafc",
     fg = "#1e293b",
     primary = "#4f46e5",
@@ -56,7 +48,6 @@ app_theme_light <- function() {
     warning = "#d97706",
     danger = "#dc2626",
     info = "#0284c7",
-    "font-size-base" = "0.875rem",
     "card-bg" = "#ffffff",
     "card-border-color" = "#e2e8f0",
     "card-cap-bg" = "#f8fafc",
@@ -69,10 +60,27 @@ app_theme_light <- function() {
     "border-color" = "#e2e8f0",
     "link-color" = "#4f46e5",
     "modal-content-bg" = "#ffffff",
+    "modal-header-border-color" = "#e2e8f0",
+    "modal-footer-border-color" = "#e2e8f0",
     "offcanvas-bg" = "#f8fafc",
-    "table-color" = "#1e293b",
-    "table-bg" = "transparent",
-    base_font = bslib::font_google("Inter")
+    "offcanvas-border-color" = "#e2e8f0",
+    "dropdown-bg" = "#ffffff",
+    "dropdown-border-color" = "#e2e8f0",
+    "table-color" = "#1e293b"
+  )
+  palette <- if (is_dark) dark else light
+  do.call(
+    bslib::bs_theme,
+    c(
+      list(
+        version = 5,
+        "font-size-base" = "0.875rem",
+        "table-bg" = "transparent",
+        "table-striped-bg" = "rgba(99,102,241,0.05)"
+      ),
+      palette,
+      list(base_font = bslib::font_google("Inter"))
+    )
   )
 }
 
@@ -83,7 +91,6 @@ app_theme_light <- function() {
 #' @noRd
 app_head_tags <- function() {
   tags$head(
-    shinyjs::useShinyjs(),
     tags$meta(charset = "utf-8"),
     tags$meta(
       name = "viewport",
@@ -103,11 +110,15 @@ app_head_tags <- function() {
           });
           document.querySelectorAll('.sidebar-nav-item').forEach(function(el) {
             el.classList.remove('active');
+            el.removeAttribute('aria-current');
           });
           var pane = document.getElementById('pane-' + id);
           if (pane) pane.classList.add('active');
           var nav = document.querySelector('[data-pane=\"' + id + '\"]');
-          if (nav) nav.classList.add('active');
+          if (nav) {
+            nav.classList.add('active');
+            nav.setAttribute('aria-current', 'page');
+          }
           Shiny.setInputValue('active_tab', id);
         }
 
@@ -139,12 +150,20 @@ app_head_tags <- function() {
           var fhdr = document.getElementById('filter-panel-header');
           if (fhdr) {
             fhdr.addEventListener('click', function() {
-              fhdr.classList.toggle('open');
+              var open = fhdr.classList.toggle('open');
+              fhdr.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            fhdr.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fhdr.click();
+              }
             });
           }
+        });
 
-          var tips = [].slice.call(document.querySelectorAll('[data-bs-toggle=\"tooltip\"]'));
-          tips.forEach(function(el) { new bootstrap.Tooltip(el); });
+        Shiny.addCustomMessageHandler('runjs', function(msg) {
+          eval(msg.code);
         });
 
         window.recipeR_navigate = activatePane;
@@ -175,37 +194,46 @@ app_sidebar <- function(initial_mode = "dark") {
 
     tags$div(
       class = "sidebar-nav",
+      role = "navigation",
+      `aria-label` = "Primary",
       tags$button(
+        type = "button",
         class = "sidebar-nav-item active",
+        `aria-current` = "page",
         `data-pane` = "home",
         tags$i(class = "fas fa-house"),
         " Home"
       ),
       tags$button(
+        type = "button",
         class = "sidebar-nav-item",
         `data-pane` = "browse",
         tags$i(class = "fas fa-book-open"),
         " Browse"
       ),
       tags$button(
+        type = "button",
         class = "sidebar-nav-item",
         `data-pane` = "add",
         tags$i(class = "fas fa-plus"),
         " Add Recipe"
       ),
       tags$button(
+        type = "button",
         class = "sidebar-nav-item",
         `data-pane` = "ingredients",
         tags$i(class = "fas fa-carrot"),
         " My Ingredients"
       ),
       tags$button(
+        type = "button",
         class = "sidebar-nav-item",
         `data-pane` = "shopping",
         tags$i(class = "fas fa-cart-shopping"),
         " Shopping"
       ),
       tags$button(
+        type = "button",
         class = "sidebar-nav-item",
         `data-pane` = "settings",
         tags$i(class = "fas fa-gear"),
@@ -232,16 +260,16 @@ app_sidebar <- function(initial_mode = "dark") {
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
-  prefs        <- get_prefs()
+  prefs <- get_prefs()
   initial_mode <- if (identical(prefs$color_mode, "light")) "light" else "dark"
-  theme        <- if (identical(initial_mode, "light")) app_theme_light() else app_theme_dark()
+  theme <- app_theme(initial_mode)
 
   shinyUI(
     bslib::page_sidebar(
-      title        = NULL,
-      theme        = theme,
+      title = NULL,
+      theme = theme,
       window_title = "recipeR",
-      fillable     = FALSE,
+      fillable = FALSE,
       app_head_tags(),
       sidebar = app_sidebar(initial_mode),
       mod_home_ui("home"),

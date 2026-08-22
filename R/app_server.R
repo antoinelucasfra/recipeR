@@ -26,9 +26,9 @@ app_server <- function(input, output, session) {
   # Theme toggle (sidebar widget, outside any module)
   observeEvent(input$color_mode, {
     if (input$color_mode == "light") {
-      session$setCurrentTheme(app_theme_light())
+      session$setCurrentTheme(app_theme("light"))
     } else {
-      session$setCurrentTheme(app_theme_dark())
+      session$setCurrentTheme(app_theme("dark"))
     }
     prefs <- get_prefs()
     prefs$color_mode <- input$color_mode

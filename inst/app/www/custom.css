@@ -92,10 +92,11 @@ html, body {
 }
 
 /* Main content area */
-.bslib-sidebar-layout > .main,
-.bslib-page-sidebar > .main {
-  background: var(--bg) !important;
-  overflow-y: auto;
+  .bslib-sidebar-layout > .main,
+  .bslib-page-sidebar > .main {
+    position: relative;
+    background: var(--bg) !important;
+    overflow-y: auto;
   padding: 0 !important;
 }
 
@@ -195,13 +196,24 @@ html, body {
 /* --------------------------------------------------------------------------
    Content Pane (JS tab switching)
    -------------------------------------------------------------------------- */
-.content-pane {
-  display: none;
-  padding: 2rem 2.5rem;
-  max-width: 1280px;
-}
+  .content-pane {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    visibility: hidden;
+    pointer-events: none;
+    padding: 2rem 2.5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
 
-.content-pane.active { display: block; }
+  .content-pane.active {
+    position: relative;
+    visibility: visible;
+    pointer-events: auto;
+  }
 
 /* --------------------------------------------------------------------------
    Page Header
@@ -301,6 +313,22 @@ html, body {
 }
 
 .filter-panel-header.open .chevron { transform: rotate(180deg); }
+/* Filters panel is revealed only when the header carries .open (toggled in JS) */
+#filter_panel { display: none; }
+#filter-panel-header.open + #filter_panel {
+  display: block;
+  animation: panel-in 0.2s ease;
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Div acting as a button must show a focus ring when keyboard-focused */
+.filter-panel-header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
 
 /* --------------------------------------------------------------------------
    Browse Stats Bar
@@ -1171,3 +1199,27 @@ textarea.form-control { resize: vertical; }
 
   .cooking-step-text { font-size: 1.1rem; }
 }
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Visually hidden but available to screen readers (used for input labels) */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+

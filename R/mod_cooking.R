@@ -63,19 +63,30 @@ mod_cooking_server <- function(id, rv) {
             class = "cooking-ing-list",
             lapply(r$ingredients, function(i) {
               tags$li(
-                if (!is.null(i$raw_text) && nzchar(i$raw_text)) i$raw_text else i$ingredient_name
+                if (!is.null(i$raw_text) && nzchar(i$raw_text)) {
+                  i$raw_text
+                } else {
+                  i$ingredient_name
+                }
               )
             })
           )
         ),
         tags$div(
           class = "cooking-nav",
-          if (step == 1L) shinyjs::disabled(prev_btn) else prev_btn,
-          tags$span(class = "cooking-nav-counter", paste0(step, " / ", n_steps)),
+          if (step == 1L) shiny::disabled(prev_btn) else prev_btn,
+          tags$span(
+            class = "cooking-nav-counter",
+            paste0(step, " / ", n_steps)
+          ),
           actionButton(
             ns("cook_next"),
             if (is_last) "Done! Finish" else "Next ->",
-            class = if (is_last) "btn btn-success btn-lg" else "btn btn-primary btn-lg"
+            class = if (is_last) {
+              "btn btn-success btn-lg"
+            } else {
+              "btn btn-primary btn-lg"
+            }
           )
         )
       )
@@ -84,7 +95,10 @@ mod_cooking_server <- function(id, rv) {
     observeEvent(input$cook_exit, {
       rv$cooking_recipe <- NULL
       rv$cooking_step <- 1L
-      shinyjs::runjs("window.recipeR_navigate('browse')")
+      session$sendCustomMessage(
+        "runjs",
+        list(code = "window.recipeR_navigate('browse')")
+      )
     })
 
     observeEvent(input$cook_prev, {
@@ -93,7 +107,9 @@ mod_cooking_server <- function(id, rv) {
 
     observeEvent(input$cook_next, {
       r <- rv$cooking_recipe
-      if (is.null(r)) return()
+      if (is.null(r)) {
+        return()
+      }
       n_steps <- length(r$instructions)
       if (rv$cooking_step >= n_steps) {
         showNotification(
@@ -102,7 +118,10 @@ mod_cooking_server <- function(id, rv) {
         )
         rv$cooking_recipe <- NULL
         rv$cooking_step <- 1L
-        shinyjs::runjs("window.recipeR_navigate('browse')")
+        session$sendCustomMessage(
+          "runjs",
+          list(code = "window.recipeR_navigate('browse')")
+        )
       } else {
         rv$cooking_step <- rv$cooking_step + 1L
       }

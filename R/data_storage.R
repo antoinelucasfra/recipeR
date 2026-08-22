@@ -1,28 +1,16 @@
 ## Simple data storage utilities for recipeR (RDS in user home)
 
-data_file <- function() {
+app_file <- function(name) {
   dir <- file.path(path.expand("~"), ".recipeR")
   if (!dir.exists(dir)) {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   }
-  file.path(dir, "recipes.rds")
-}
-
-shopping_file <- function() {
-  dir <- file.path(path.expand("~"), ".recipeR")
-  if (!dir.exists(dir)) {
-    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-  }
-  file.path(dir, "shopping.rds")
+  file.path(dir, name)
 }
 
 load_db <- function() {
-  f <- data_file()
-  if (!file.exists(f)) {
-    return(list(recipes = list(), ingredients = list()))
-  }
   tryCatch(
-    readRDS(f),
+    readRDS(app_file("recipes.rds")),
     error = function(e) {
       warning(
         "recipeR: could not read data file (",
@@ -35,13 +23,12 @@ load_db <- function() {
 }
 
 save_db <- function(db) {
-  f <- data_file()
-  saveRDS(db, f)
+  saveRDS(db, app_file("recipes.rds"))
   invisible(TRUE)
 }
 
 get_shopping_list <- function() {
-  f <- shopping_file()
+  f <- app_file("shopping.rds")
   if (!file.exists(f)) {
     return(list())
   }
@@ -54,7 +41,7 @@ get_shopping_list <- function() {
 }
 
 save_shopping_list <- function(items) {
-  f <- shopping_file()
+  f <- app_file("shopping.rds")
   # Accept legacy character vector; normalise to list format before saving
   if (is.character(items)) {
     items <- lapply(items, function(x) list(text = x, checked = FALSE))
@@ -156,7 +143,7 @@ backup_db <- function() {
   if (!dir.exists(dir)) {
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
   }
-  src <- data_file()
+  src <- app_file("recipes.rds")
   if (!file.exists(src)) {
     stop("No DB to backup")
   }
@@ -180,21 +167,13 @@ restore_backup <- function(path) {
   if (!file.exists(path)) {
     stop("Backup not found")
   }
-  file.copy(path, data_file(), overwrite = TRUE)
+  file.copy(path, app_file("recipes.rds"), overwrite = TRUE)
   invisible(TRUE)
 }
 
 ## Preferences
-prefs_file <- function() {
-  dir <- file.path(path.expand("~"), ".recipeR")
-  if (!dir.exists(dir)) {
-    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
-  }
-  file.path(dir, "prefs.rds")
-}
-
 get_prefs <- function() {
-  f <- prefs_file()
+  f <- app_file("prefs.rds")
   if (!file.exists(f)) {
     return(list(unit_system = "american"))
   }
@@ -202,7 +181,7 @@ get_prefs <- function() {
 }
 
 save_prefs <- function(prefs) {
-  f <- prefs_file()
+  f <- app_file("prefs.rds")
   saveRDS(prefs, f)
   invisible(TRUE)
 }
@@ -271,17 +250,6 @@ add_ingredient <- function(ing) {
 get_ingredients <- function() {
   db <- load_db()
   if (is.null(db$ingredients)) list() else db$ingredients
-}
-
-update_ingredient <- function(id, ing) {
-  db <- load_db()
-  if (is.null(db$ingredients)) {
-    db$ingredients <- list()
-  }
-  ing$id <- id
-  db$ingredients[[id]] <- ing
-  save_db(db)
-  ing
 }
 
 delete_ingredient <- function(id) {

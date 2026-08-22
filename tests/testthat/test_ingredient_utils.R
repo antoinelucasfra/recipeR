@@ -21,11 +21,3 @@ test_that('unit conversion to metric and back works', {
   pref <- metric_to_preferred(236.588, 'volume', 'american')
   expect_equal(pref$unit, 'cup')
 })
-
-test_that('density conversions approximate expected values', {
-  # 1 cup flour ~125g
-  d <- get_density('all purpose flour')
-  expect_true(!is.na(d))
-  g <- volume_ml_to_mass_g(236.588, 'flour')
-  expect_true(abs(g - 125) < 20) # allow tolerance
-})

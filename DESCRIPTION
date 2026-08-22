@@ -7,16 +7,13 @@ Description: A golem-based Shiny application for managing recipes and ingredient
 License: MIT + file LICENSE
 Imports:
     bslib,
-    config,
     DT,
     golem,
     jsonlite,
     shiny,
-    shinyjs,
     shinyWidgets,
     tools,
     utils,
-    pkgload
 Suggests:
     knitr,
     rmarkdown,

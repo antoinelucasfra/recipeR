@@ -26,7 +26,7 @@ mod_settings_ui <- function(id) {
           ),
           radioButtons(
             ns("unit_system"),
-            NULL,
+            tags$span("Unit system preference", class = "visually-hidden"),
             choices = c(
               "American" = "american",
               "European / Metric" = "european"
@@ -38,48 +38,6 @@ mod_settings_ui <- function(id) {
             ns("save_prefs"),
             tagList(tags$i(class = "fas fa-floppy-disk"), " Save"),
             class = "btn btn-primary mt-2"
-          )
-        ),
-
-        bslib::accordion_panel(
-          value = "densities",
-          title = tagList(
-            tags$i(class = "fas fa-flask", style = "margin-right:0.4rem;"),
-            "Ingredient Densities"
-          ),
-          tags$p(
-            class = "text-muted",
-            style = "font-size:0.825rem;margin-bottom:1rem;",
-            "Densities (g/ml) enable volume-to-mass conversions."
-          ),
-          DT::dataTableOutput(ns("densities_table")),
-          tags$hr(),
-          tags$h6(class = "settings-section-label", "Add Custom Density"),
-          bslib::layout_columns(
-            col_widths = c(6, 6),
-            textInput(ns("new_density_ingredient"), "Ingredient", width = "100%"),
-            numericInput(
-              ns("new_density_value"),
-              "Density (g/ml)",
-              value = 1.0,
-              min = 0.1,
-              step = 0.01,
-              width = "100%"
-            )
-          ),
-          tags$div(
-            class = "mt-3",
-            style = "display:flex;gap:0.5rem;",
-            actionButton(
-              ns("add_density_btn"),
-              tagList(tags$i(class = "fas fa-plus"), " Add"),
-              class = "btn btn-success"
-            ),
-            actionButton(
-              ns("delete_density_btn"),
-              tagList(tags$i(class = "fas fa-trash"), " Delete Selected"),
-              class = "btn btn-danger"
-            )
           )
         ),
 
@@ -171,8 +129,6 @@ mod_settings_ui <- function(id) {
 #' @noRd
 mod_settings_server <- function(id, rv, refresh_data, parent_session) {
   moduleServer(id, function(input, output, session) {
-    ns <- session$ns
-
     observe({
       prefs <- get_prefs()
       if (!is.null(prefs$unit_system)) {
@@ -183,74 +139,6 @@ mod_settings_server <- function(id, rv, refresh_data, parent_session) {
     observeEvent(input$save_prefs, {
       save_prefs(list(unit_system = input$unit_system))
       showNotification("Preferences saved", type = "message")
-    })
-
-    output$densities_table <- DT::renderDataTable({
-      all_densities <- list_all_densities()
-      DT::datatable(
-        all_densities,
-        rownames = FALSE,
-        selection = "single",
-        options = list(pageLength = 10)
-      )
-    })
-
-    observeEvent(input$add_density_btn, {
-      ing_name <- trimws(input$new_density_ingredient)
-      ing_value <- as.numeric(input$new_density_value)
-      if (!nzchar(ing_name)) {
-        showNotification("Please enter an ingredient name", type = "error")
-        return()
-      }
-      if (is.null(ing_value) || is.na(ing_value) || ing_value <= 0) {
-        showNotification(
-          "Please enter a valid density value (must be > 0)",
-          type = "error"
-        )
-        return()
-      }
-      add_custom_density(ing_name, ing_value)
-      showNotification(
-        sprintf("Added custom density: %s = %.2f g/ml", ing_name, ing_value),
-        type = "message"
-      )
-      updateTextInput(session, "new_density_ingredient", value = "")
-      updateNumericInput(session, "new_density_value", value = 1.0)
-      output$densities_table <- DT::renderDataTable({
-        DT::datatable(
-          list_all_densities(),
-          rownames = FALSE,
-          selection = "single",
-          options = list(pageLength = 10)
-        )
-      })
-    })
-
-    observeEvent(input$delete_density_btn, {
-      sel <- input$densities_table_rows_selected
-      if (is.null(sel) || length(sel) == 0) {
-        showNotification("Select a density row to delete", type = "error")
-        return()
-      }
-      df <- list_all_densities()
-      row <- df[sel, ]
-      if (row$source != "custom") {
-        showNotification("Only custom densities can be deleted", type = "warning")
-        return()
-      }
-      delete_custom_density(row$ingredient)
-      showNotification(
-        sprintf("Deleted density for '%s'", row$ingredient),
-        type = "message"
-      )
-      output$densities_table <- DT::renderDataTable({
-        DT::datatable(
-          list_all_densities(),
-          rownames = FALSE,
-          selection = "single",
-          options = list(pageLength = 10)
-        )
-      })
     })
 
     output$export_json <- downloadHandler(
@@ -326,7 +214,10 @@ mod_settings_server <- function(id, rv, refresh_data, parent_session) {
               refresh_data()
             },
             error = function(e) {
-              showNotification(paste("Restore failed:", e$message), type = "error")
+              showNotification(
+                paste("Restore failed:", e$message),
+                type = "error"
+              )
             }
           )
           removeModal()
