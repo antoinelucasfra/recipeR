@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-recipeR is a golem-based Shiny application for managing recipes and ingredients. It provides unit conversion (American/metric), ingredient matching against inventory, density-based volume-to-mass conversions, shopping list management, and file-based persistence. Data is stored in RDS files under `~/.recipeR/`.
+recipeR is a golem-based Shiny application for managing recipes and ingredients. It provides unit conversion (American/metric), ingredient matching against inventory, shopping list management, and file-based persistence. Data is stored in RDS files under `~/.recipeR/`.
 
 ## Architecture & Data Flow
 
@@ -42,19 +42,17 @@ mod_settings_server("settings", rv, refresh_data, session)
 
 | Directory | Purpose |
 |-----------|---------|
-  | `R/` | All source code (15 files): modules, helpers, UI, server |
+  | `R/` | All source code (13 files): modules, helpers, UI, server |
 | `R/mod_*.R` | Shiny modules (one per tab) |
-| `R/app_ui.R` | Full UI definition (~257 lines, bslib + Bootstrap 5) |
+| `R/app_ui.R` | Full UI definition (~257 lines, bslib + Bootstrap 5 + shinyglass Liquid Glass) |
 | `R/app_server.R` | Server entry point, reactive state, module wiring |
 | `R/data_storage.R` | RDS persistence layer (CRUD for recipes, ingredients, shopping, prefs) |
-| `R/ingredient_utils.R` | Ingredient line parsing, unit conversion, density lookups |
-| `R/density_management.R` | Custom density CRUD (overrides built-in densities) |
+| `R/ingredient_utils.R` | Ingredient line parsing, unit conversion |
 | `R/matching_module.R` | Recipe-ingredient matching algorithm |
 | `inst/app/www/` | Static assets: `custom.css` (29.9 KB), `favicon.ico` |
 | `inst/golem-config.yml` | Golem configuration (dev/prod profiles) |
 | `dev/` | Development scripts (run_dev, checks, test scripts) |
-| `tests/testthat/` | Test directory (1 test file) |
-| `vignettes/` | Vignette skeleton (`recipeR.Rmd`) |
+| `tests/testthat/` | Test directory |
 
 ## Development Commands
 
@@ -79,7 +77,7 @@ Every module has `mod_<name>_ui(id)` returning a `tagList` and `mod_<name>_serve
 
 ### UI
 - `bslib` Bootstrap 5 with `page_sidebar()` layout
-- Dark/light theme toggle via `color_mode` input
+- Dark/light/auto theme toggle via `glass_theme_toggle()` (shinyglass), preset persisted via `save_prefs()`
 - Components: `card()`, `value_box()`, `layout_columns()`, `accordion()`, `DT::DTOutput()`
 - Custom CSS in `inst/app/www/custom.css`
 - Font: Inter (Google Fonts via bslib)
@@ -88,7 +86,7 @@ Every module has `mod_<name>_ui(id)` returning a `tagList` and `mod_<name>_serve
 - All data stored as RDS in `~/.recipeR/`
 - `data_storage.R` exports: `get_recipes()`, `save_recipes()`, `get_ingredients()`, `save_ingredients()`, `get_shopping_list()`, `save_shopping_list()`, `get_prefs()`, `save_prefs()`
 - Import/Export: `export_recipes_json()`, `export_recipes_csv()`, `import_recipes_json()`, `import_recipes_csv()`
-- Backup/Restore: `create_backup()`, `restore_backup()`, `list_backups()`
+- Backup/Restore: `backup_db()`, `restore_backup()`, `list_backups()`
 - Error handling: `tryCatch` with graceful fallback to empty state
 
 ### Ingredient utilities (`ingredient_utils.R`)
@@ -96,14 +94,7 @@ Every module has `mod_<name>_ui(id)` returning a `tagList` and `mod_<name>_serve
   - `parse_ingredient_line(line)` — extracts `$quantity`, `$unit`, `$name`, `$raw` from a line like "1 1/2 cups flour"
   - `unit_to_metric(amount, unit)` — convert to ml or g
   - `metric_to_preferred(amount, type, system)` — convert back to preferred unit system
-  - `get_density(name)` — lookup built-in density (g/ml) for an ingredient
   - `parse_ingredients_raw(text)` — parse a multi-line ingredient list into structured rows
-  - 40+ built-in densities for common ingredients (flours, sugars, fats, liquids, seasonings)
-### Density management (`density_management.R`)
-- Custom densities stored in `~/.recipeR/densities.rds`
-- `add_custom_density()`, `delete_custom_density()`, `get_custom_densities()`
-- `list_all_densities()` merges built-in + custom
-- Custom densities take priority over built-in
 
 ### Matching (`matching_module.R`)
 - Computes match percentage between recipe ingredients and available inventory
@@ -135,8 +126,7 @@ Every module has `mod_<name>_ui(id)` returning a `tagList` and `mod_<name>_serve
 | `R/app_ui.R` | Full UI with bslib themes, sidebar, tab navigation |
 | `R/app_server.R` | Server logic, reactiveValues init, module wiring, theme toggle |
 | `R/data_storage.R` | All file I/O: recipes, ingredients, shopping, prefs, import/export, backup |
-| `R/ingredient_utils.R` | Parsing, conversion, density lookup logic |
-| `R/density_management.R` | Custom density CRUD |
+| `R/ingredient_utils.R` | Parsing and unit conversion logic |
 | `R/matching_module.R` | Ingredient matching algorithm |
 | `inst/golem-config.yml` | Golem configuration (dev vs production) |
 | `inst/app/www/custom.css` | App styling |
@@ -158,8 +148,7 @@ Every module has `mod_<name>_ui(id)` returning a `tagList` and `mod_<name>_serve
 - **Framework**: testthat (3rd edition, per renv.lock)
 - **Test location**: `tests/testthat/`
   - **Files**: `test_ingredient_utils.R` (10 tests across 4 contexts)
-- **Coverage**: fraction parsing, ingredient line parsing, unit conversion (round-trip American/metric), density-based volume-to-mass conversion
-- **Dev test scripts**: `dev/test_density_admin.R`, `dev/test_density_feature_complete.R` (manual/QE-style)
+- **Coverage**: fraction parsing, ingredient line parsing, unit conversion (round-trip American/metric)
 - **Run**: `devtools::test()` or `devtools::test(filter = "pattern")`
 **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs `devtools::test()`, `air --check .`, and `lintr::lint_dir("R")` on push/PR to `main`/`develop`.
 **Local pre-commit** (workspace convention): `air-format` + `jarl-check` (R); the `devtools::test()` gate runs in CI.

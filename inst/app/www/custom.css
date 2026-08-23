@@ -9,42 +9,42 @@
    -------------------------------------------------------------------------- */
 :root,
 [data-bs-theme="light"] {
-  --bg: transparent;
-  --surface: var(--glass-bg-content);
-  --surface-2: var(--glass-bg-hover);
-  --surface-3: var(--glass-bg-hover);
-  --border: var(--glass-border);
-  --border-light: var(--glass-rim);
-  --accent: #4f46e5;
-  --accent-dark: #4338ca;
-  --accent-glow: rgba(79, 70, 229, 0.12);
-  --accent-glow2: rgba(79, 70, 229, 0.06);
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --info: #0284c7;
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --text-dim: #94a3b8;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1);
-  --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.14);
+ --bg: transparent;
+ --surface: var(--glass-bg-content);
+ --surface-2: var(--glass-bg-hover);
+ --surface-3: var(--glass-bg-hover);
+ --border: var(--glass-border);
+ --border-light: var(--glass-rim);
+ --accent: #4f46e5;
+ --accent-dark: #4338ca;
+ --accent-glow: rgba(79, 70, 229, 0.12);
+ --accent-glow2: rgba(79, 70, 229, 0.06);
+ --success: #059669;
+ --warning: #d97706;
+ --danger: #dc2626;
+ --info: #0284c7;
+ --text: #1e293b;
+ --text-muted: #64748b;
+ --text-dim: #94a3b8;
+ --radius: 10px;
+ --radius-sm: 6px;
+ --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+ --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1);
+ --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.14);
 }
 
 [data-bs-theme="dark"] {
-  --accent: #818cf8;
-  --accent-dark: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.22);
-  --accent-glow2: rgba(99, 102, 241, 0.1);
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --info: #38bdf8;
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+ --accent: #818cf8;
+ --accent-dark: #6366f1;
+ --accent-glow: rgba(99, 102, 241, 0.22);
+ --accent-glow2: rgba(99, 102, 241, 0.1);
+ --success: #34d399;
+ --warning: #fbbf24;
+ --danger: #f87171;
+ --info: #38bdf8;
+ --text: #e2e8f0;
+ --text-muted: #94a3b8;
+ --text-dim: #64748b;
 }
 
 /* --------------------------------------------------------------------------
@@ -53,7 +53,7 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+ box-sizing: border-box;
 }
 
 /* Glass material for surfaces recipeR styles itself */
@@ -61,1067 +61,1068 @@
 .value-box,
 .modal-content,
 .accordion-item {
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur))
-    saturate(var(--glass-saturate));
+ backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+ -webkit-backdrop-filter: blur(var(--glass-blur))
+  saturate(var(--glass-saturate));
 }
 
 html,
 body {
-  height: 100%;
-  background: var(--glass-page-bg, var(--bg));
-  color: var(--glass-body-color, var(--text));
-  -webkit-font-smoothing: antialiased;
+ height: 100%;
+ background: var(--glass-page-bg, var(--bg));
+ color: var(--glass-body-color, var(--text));
+ -webkit-font-smoothing: antialiased;
 }
 
 /* bslib page_sidebar shell — let the glass page background show through */
 .bslib-page-sidebar {
-  background: transparent !important;
+ background: transparent !important;
 }
 
 .container-fluid {
-  padding: 0;
+ padding: 0;
 }
 
 /* --------------------------------------------------------------------------
    Sidebar (bslib generates .sidebar inside .bslib-sidebar-layout)
    -------------------------------------------------------------------------- */
 .bslib-sidebar-layout > .sidebar {
-  background: color-mix(in srgb, var(--glass-bg) 55%, transparent) !important;
-  border-right: 1px solid var(--glass-border) !important;
-  padding: 0 !important;
-  overflow-y: auto;
+ background: color-mix(in srgb, var(--glass-bg) 55%, transparent) !important;
+ border-right: 1px solid var(--glass-border) !important;
+ padding: 0 !important;
+ overflow-y: auto;
 }
 
 /* bslib sidebar collapse/toggle button */
 .bslib-sidebar-layout .collapse-toggle {
-  background: var(--glass-bg-hover) !important;
-  border-color: var(--glass-border) !important;
-  color: var(--text-muted) !important;
+ background: var(--glass-bg-hover) !important;
+ border-color: var(--glass-border) !important;
+ color: var(--text-muted) !important;
 }
 
 .bslib-sidebar-layout .collapse-toggle:hover {
-  color: var(--accent) !important;
+ color: var(--accent) !important;
 }
 
 /* Main content area — leave layout/padding to shinyglass float rules */
 .bslib-sidebar-layout > .main,
 .bslib-page-sidebar > .main {
-  background: transparent !important;
-  overflow-y: auto;
+ background: transparent !important;
+ overflow-y: auto;
 }
 
 /* --------------------------------------------------------------------------
    Sidebar Navigation (custom classes inside bslib sidebar)
    -------------------------------------------------------------------------- */
 .sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 1.25rem 1.2rem 1rem;
-  border-bottom: 1px solid var(--border);
+ display: flex;
+ align-items: center;
+ gap: 0.65rem;
+ padding: 1.25rem 1.2rem 1rem;
+ border-bottom: 1px solid var(--border);
 }
 
 .sidebar-logo-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px var(--accent-glow);
+ width: 32px;
+ height: 32px;
+ background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+ border-radius: 8px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: #fff;
+ font-size: 0.9rem;
+ flex-shrink: 0;
+ box-shadow: 0 0 12px var(--accent-glow);
 }
 
 .sidebar-logo-text {
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  background: linear-gradient(
-    120deg,
-    var(--accent),
-    var(--glass-accent, var(--accent))
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+ font-size: 1.05rem;
+ font-weight: 800;
+ letter-spacing: -0.3px;
+ background: linear-gradient(
+  120deg,
+  var(--accent),
+  var(--glass-accent, var(--accent))
+ );
+ -webkit-background-clip: text;
+ background-clip: text;
+ color: transparent;
 }
 
 .sidebar-nav {
-  flex: 1;
-  padding: 0.75rem 0.6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+ flex: 1;
+ padding: 0.75rem 0.6rem;
+ display: flex;
+ flex-direction: column;
+ gap: 2px;
 }
 
 .sidebar-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: calc(var(--glass-radius-sm) + 2px);
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: 1px solid transparent;
-  transition: all 0.18s ease;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  user-select: none;
+ display: flex;
+ align-items: center;
+ gap: 0.75rem;
+ padding: 0.6rem 0.8rem;
+ border-radius: calc(var(--glass-radius-sm) + 2px);
+ cursor: pointer;
+ color: var(--text-muted);
+ font-size: 0.875rem;
+ font-weight: 500;
+ border: 1px solid transparent;
+ transition: all 0.18s ease;
+ background: transparent;
+ width: 100%;
+ text-align: left;
+ user-select: none;
 }
 
 .sidebar-nav-item i {
-  width: 16px;
-  text-align: center;
-  font-size: 0.85rem;
-  flex-shrink: 0;
-  transition: transform 0.18s ease;
+ width: 16px;
+ text-align: center;
+ font-size: 0.85rem;
+ flex-shrink: 0;
+ transition: transform 0.18s ease;
 }
 
 .sidebar-nav-item:hover {
-  background: var(--glass-bg-hover);
-  color: var(--text);
-  border-color: var(--glass-border);
+ background: var(--glass-bg-hover);
+ color: var(--text);
+ border-color: var(--glass-border);
 }
 
 .sidebar-nav-item:hover i {
-  transform: scale(1.12);
+ transform: scale(1.12);
 }
 
 .sidebar-nav-item.active {
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in srgb, var(--accent) 65%, #a855f7)
-  );
-  color: #fff;
-  border-color: transparent;
-  box-shadow:
-    0 4px 14px var(--accent-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+ background: linear-gradient(
+  135deg,
+  var(--accent),
+  color-mix(in srgb, var(--accent) 65%, #a855f7)
+ );
+ color: #fff;
+ border-color: transparent;
+ box-shadow:
+  0 4px 14px var(--accent-glow),
+  inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .sidebar-nav-item.active i {
-  color: #fff;
+ color: #fff;
 }
 
 .sidebar-footer {
-  padding: 0.9rem 0.6rem 1rem;
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+ padding: 0.9rem 0.6rem 1rem;
+ border-top: 1px solid var(--border);
+ display: flex;
+ flex-direction: column;
+ gap: 0.6rem;
 }
 
 /* --- shinyglass theme toggle → compact segmented control --- */
 .sidebar-footer .glass-theme-toggle {
-  display: inline-flex;
-  flex-wrap: nowrap;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 99px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+ display: inline-flex;
+ flex-wrap: nowrap;
+ gap: 2px;
+ padding: 3px;
+ border-radius: 99px;
+ background: var(--glass-bg);
+ border: 1px solid var(--glass-border);
 }
 
 .sidebar-footer .glass-theme-toggle .btn {
-  border: none !important;
-  background: transparent !important;
-  color: var(--text-muted) !important;
-  border-radius: 99px !important;
-  padding: 0.2rem 0.45rem !important;
-  font-size: 0.64rem !important;
-  font-weight: 600 !important;
-  box-shadow: none !important;
-  white-space: nowrap !important;
+ border: none !important;
+ background: transparent !important;
+ color: var(--text-muted) !important;
+ border-radius: 99px !important;
+ padding: 0.2rem 0.45rem !important;
+ font-size: 0.64rem !important;
+ font-weight: 600 !important;
+ box-shadow: none !important;
+ white-space: nowrap !important;
 }
 
 .sidebar-footer .glass-theme-toggle .btn:hover {
-  color: var(--text) !important;
+ color: var(--text) !important;
 }
 
 .sidebar-footer .glass-theme-toggle .btn.btn-primary,
 .sidebar-footer .glass-theme-toggle .btn[aria-pressed="true"] {
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in srgb, var(--accent) 65%, #a855f7)
-  ) !important;
-  color: #fff !important;
-  box-shadow: 0 2px 8px var(--accent-glow) !important;
+ background: linear-gradient(
+  135deg,
+  var(--accent),
+  color-mix(in srgb, var(--accent) 65%, #a855f7)
+ ) !important;
+ color: #fff !important;
+ box-shadow: 0 2px 8px var(--accent-glow) !important;
 }
 
 /* --- intensity slider: slim, no preview chips / hint --- */
 .sidebar-footer .glass-intensity-slider {
-  margin: 0;
-  width: 100%;
+ margin: 0;
+ width: 100%;
 }
 
 .sidebar-footer .glass-intensity-preview,
 .sidebar-footer .glass-intensity-hint {
-  display: none !important;
+ display: none !important;
 }
 
 .sidebar-footer .glass-intensity-end {
-  font-size: 0.62rem;
-  color: var(--text-dim);
+ font-size: 0.62rem;
+ color: var(--text-dim);
 }
 
 .sidebar-footer .glass-intensity-track {
-  height: 4px;
+ height: 4px;
 }
 
 .sidebar-hint {
-  font-size: 0.72rem;
-  color: var(--text-dim);
+ font-size: 0.72rem;
+ color: var(--text-dim);
 }
 
 /* --------------------------------------------------------------------------
    Content Pane (JS tab switching)
    -------------------------------------------------------------------------- */
 .content-pane {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  visibility: hidden;
-  pointer-events: none;
-  padding: 2rem 2.5rem;
-  max-width: 1280px;
-  margin: 0 auto;
+ display: block;
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ visibility: hidden;
+ pointer-events: none;
+ padding: 2rem 2.5rem;
+ max-width: 1280px;
+ margin: 0 auto;
 }
 
 .content-pane.active {
-  position: relative;
-  visibility: visible;
-  pointer-events: auto;
-  animation: pane-in 0.32s cubic-bezier(0.22, 0.9, 0.35, 1);
+ position: relative;
+ visibility: visible;
+ pointer-events: auto;
+ animation: pane-in 0.32s cubic-bezier(0.22, 0.9, 0.35, 1);
 }
 
 @keyframes pane-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.995);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+ from {
+  opacity: 0;
+  transform: translateY(10px) scale(0.995);
+ }
+ to {
+  opacity: 1;
+  transform: none;
+ }
 }
 
 /* --------------------------------------------------------------------------
    Page Header
    -------------------------------------------------------------------------- */
 .page-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
+ margin-bottom: 2rem;
+ padding-bottom: 1.25rem;
+ border-bottom: 1px solid var(--border);
 }
 
 .page-title {
-  font-size: 1.9rem;
-  font-weight: 800;
-  letter-spacing: -0.6px;
-  margin-bottom: 0.25rem;
-  background: linear-gradient(120deg, var(--text) 30%, var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+ font-size: 1.9rem;
+ font-weight: 800;
+ letter-spacing: -0.6px;
+ margin-bottom: 0.25rem;
+ background: linear-gradient(120deg, var(--text) 30%, var(--accent));
+ -webkit-background-clip: text;
+ background-clip: text;
+ color: transparent;
 }
 
 .page-subtitle {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  margin: 0;
+ color: var(--text-muted);
+ font-size: 0.875rem;
+ margin: 0;
 }
 
 /* --------------------------------------------------------------------------
    Feature Cards (Home pane — clickable, glass)
    -------------------------------------------------------------------------- */
 .feature-card {
-  border-radius: var(--glass-radius);
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+ border-radius: var(--glass-radius);
+ cursor: pointer;
+ transition:
+  transform 0.18s ease,
+  box-shadow 0.18s ease;
 }
 
 .feature-card .card-body {
-  padding: 1.15rem !important;
+ padding: 1.15rem !important;
 }
 
 .feature-card:hover,
 .feature-card:focus-visible {
-  transform: translateY(-3px);
-  box-shadow:
-    0 10px 28px var(--glass-elevated-shadow),
-    0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
-  outline: none;
+ transform: translateY(-3px);
+ box-shadow:
+  0 10px 28px var(--glass-elevated-shadow),
+  0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+ outline: none;
 }
 
 .feature-card-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in srgb, var(--accent) 60%, #a855f7)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 0.95rem;
-  margin-bottom: 0.85rem;
-  box-shadow:
-    0 4px 14px var(--accent-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+ width: 42px;
+ height: 42px;
+ border-radius: 12px;
+ background: linear-gradient(
+  135deg,
+  var(--accent),
+  color-mix(in srgb, var(--accent) 60%, #a855f7)
+ );
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: #fff;
+ font-size: 0.95rem;
+ margin-bottom: 0.85rem;
+ box-shadow:
+  0 4px 14px var(--accent-glow),
+  inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* --------------------------------------------------------------------------
    Search Bar
    -------------------------------------------------------------------------- */
 .search-bar-wrap {
-  position: relative;
-  margin-bottom: 0;
+ position: relative;
+ margin-bottom: 0;
 }
 
 .search-bar-wrap .search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-dim);
-  font-size: 0.85rem;
-  pointer-events: none;
-  z-index: 2;
+ position: absolute;
+ left: 1rem;
+ top: 50%;
+ transform: translateY(-50%);
+ color: var(--text-dim);
+ font-size: 0.85rem;
+ pointer-events: none;
+ z-index: 2;
 }
 
 .search-bar-wrap .form-control {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
+ padding-left: 2.5rem;
+ padding-right: 2.5rem;
 }
 
 .search-hint-badge {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--surface-3);
-  color: var(--text-dim);
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  font-family: monospace;
-  pointer-events: none;
+ position: absolute;
+ right: 1rem;
+ top: 50%;
+ transform: translateY(-50%);
+ background: var(--surface-3);
+ color: var(--text-dim);
+ font-size: 0.7rem;
+ padding: 2px 6px;
+ border-radius: 4px;
+ border: 1px solid var(--border);
+ font-family: monospace;
+ pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
    Filter Panel
    -------------------------------------------------------------------------- */
 .filter-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 0;
-  cursor: pointer;
-  user-select: none;
-  border-top: 1px solid var(--border);
-  margin-top: 0.5rem;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ padding: 0.6rem 0;
+ cursor: pointer;
+ user-select: none;
+ border-top: 1px solid var(--border);
+ margin-top: 0.5rem;
 }
 
 .filter-panel-header:hover {
-  opacity: 0.8;
+ opacity: 0.8;
 }
 
 .filter-panel-header .chevron {
-  color: var(--text-dim);
-  font-size: 0.75rem;
-  transition: transform 0.2s;
+ color: var(--text-dim);
+ font-size: 0.75rem;
+ transition: transform 0.2s;
 }
 
 .filter-panel-header.open .chevron {
-  transform: rotate(180deg);
+ transform: rotate(180deg);
 }
 /* Filters panel is revealed only when the header carries .open (toggled in JS) */
 #filter_panel {
-  display: none;
+ display: none;
 }
 #filter-panel-header.open + #filter_panel {
-  display: block;
-  animation: panel-in 0.2s ease;
+ display: block;
+ animation: panel-in 0.2s ease;
 }
 @keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+ from {
+  opacity: 0;
+  transform: translateY(-4px);
+ }
+ to {
+  opacity: 1;
+  transform: none;
+ }
 }
 /* Div acting as a button must show a focus ring when keyboard-focused */
 .filter-panel-header:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+ outline: 2px solid var(--accent);
+ outline-offset: 2px;
+ border-radius: var(--radius-sm);
 }
 
 /* --------------------------------------------------------------------------
    Browse Stats Bar
    -------------------------------------------------------------------------- */
 .browse-stats-bar {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 0.6rem 0;
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+ display: flex;
+ align-items: center;
+ gap: 1.5rem;
+ padding: 0.6rem 0;
+ margin-bottom: 1.25rem;
+ border-bottom: 1px solid var(--border);
+ flex-wrap: wrap;
 }
 
 .browse-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
+ display: flex;
+ align-items: baseline;
+ gap: 0.4rem;
 }
 
 .browse-stat-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent);
+ font-size: 1rem;
+ font-weight: 700;
+ color: var(--accent);
 }
 
 .browse-stat-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+ font-size: 0.75rem;
+ color: var(--text-muted);
 }
 
 /* --------------------------------------------------------------------------
    Recipe Cards Grid
    -------------------------------------------------------------------------- */
 .recipe-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+ gap: 1rem;
 }
 
 .recipe-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
-  display: flex;
-  flex-direction: column;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ overflow: hidden;
+ cursor: pointer;
+ transition:
+  border-color 0.15s,
+  box-shadow 0.15s,
+  transform 0.15s;
+ display: flex;
+ flex-direction: column;
 }
 
 .recipe-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
-    0 12px 30px var(--glass-elevated-shadow);
-  transform: translateY(-3px);
+ border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+ box-shadow:
+  0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
+  0 12px 30px var(--glass-elevated-shadow);
+ transform: translateY(-3px);
 }
 
 .recipe-card .recipe-thumb {
-  transition: transform 0.35s ease;
+ transition: transform 0.35s ease;
 }
 
 .recipe-card:hover .recipe-thumb {
-  transform: scale(1.04);
+ transform: scale(1.04);
 }
 
 .recipe-thumb {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  display: block;
-  border-bottom: 1px solid var(--border);
+ width: 100%;
+ height: 140px;
+ object-fit: cover;
+ display: block;
+ border-bottom: 1px solid var(--border);
 }
 .recipe-card-body {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  flex: 1;
+ padding: 1rem;
+ display: flex;
+ flex-direction: column;
+ gap: 0.6rem;
+ flex: 1;
 }
 
 .recipe-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
+ display: flex;
+ align-items: flex-start;
+ justify-content: space-between;
+ gap: 0.5rem;
 }
 
 .recipe-card-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.35;
-  flex: 1;
+ font-size: 0.95rem;
+ font-weight: 600;
+ color: var(--text);
+ line-height: 1.35;
+ flex: 1;
 }
 
 .cuisine-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 20px;
-  background: var(--accent-glow);
-  color: var(--accent);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  white-space: nowrap;
-  flex-shrink: 0;
+ font-size: 0.7rem;
+ font-weight: 600;
+ padding: 3px 8px;
+ border-radius: 20px;
+ background: var(--accent-glow);
+ color: var(--accent);
+ border: 1px solid rgba(99, 102, 241, 0.2);
+ white-space: nowrap;
+ flex-shrink: 0;
 }
 
 .recipe-card-meta {
-  display: flex;
-  gap: 1rem;
+ display: flex;
+ gap: 1rem;
 }
 
 .recipe-meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  color: var(--text-muted);
+ display: flex;
+ align-items: center;
+ gap: 0.35rem;
+ font-size: 0.78rem;
+ color: var(--text-muted);
 }
 
 .recipe-meta-item i {
-  font-size: 0.7rem;
-  color: var(--text-dim);
+ font-size: 0.7rem;
+ color: var(--text-dim);
 }
 
 /* Tags row */
 .recipe-tags-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.3rem;
 }
 
 .recipe-tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 20px;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+ font-size: 0.68rem;
+ font-weight: 600;
+ padding: 2px 7px;
+ border-radius: 20px;
+ background: var(--surface-2);
+ color: var(--text-muted);
+ border: 1px solid var(--border);
 }
 
 /* Star rating */
 .recipe-rating {
-  font-size: 0.8rem;
-  color: var(--warning);
-  letter-spacing: 1px;
+ font-size: 0.8rem;
+ color: var(--warning);
+ letter-spacing: 1px;
 }
 
 /* Match bar */
 .match-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+ display: flex;
+ align-items: center;
+ gap: 0.6rem;
 }
 
 .match-bar-track {
-  flex: 1;
-  height: 5px;
-  background: var(--surface-3);
-  border-radius: 99px;
-  overflow: hidden;
+ flex: 1;
+ height: 5px;
+ background: var(--surface-3);
+ border-radius: 99px;
+ overflow: hidden;
 }
 
 .match-bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.4s ease;
+ height: 100%;
+ border-radius: 99px;
+ transition: width 0.4s ease;
 }
 
 .match-bar-fill.high {
-  background: var(--success);
+ background: var(--success);
 }
 .match-bar-fill.medium {
-  background: var(--warning);
+ background: var(--warning);
 }
 .match-bar-fill.low {
-  background: var(--danger);
+ background: var(--danger);
 }
 .match-bar-fill.none {
-  background: var(--surface-3);
-  width: 100% !important;
+ background: var(--surface-3);
+ width: 100% !important;
 }
 
 .match-bar-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  min-width: 32px;
-  text-align: right;
+ font-size: 0.72rem;
+ font-weight: 600;
+ color: var(--text-muted);
+ min-width: 32px;
+ text-align: right;
 }
 
 /* Card action bar */
 .recipe-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.35rem;
+ padding-top: 0.6rem;
+ border-top: 1px solid var(--border);
+ margin-top: auto;
 }
 
 /* Empty state */
 .empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--text-muted);
+ grid-column: 1 / -1;
+ text-align: center;
+ padding: 4rem 2rem;
+ color: var(--text-muted);
 }
 
 .empty-state i {
-  font-size: 2.5rem;
-  color: var(--text-dim);
-  margin-bottom: 1rem;
+ font-size: 2.5rem;
+ color: var(--text-dim);
+ margin-bottom: 1rem;
 }
 
 .empty-state h5 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 0.5rem;
+ font-size: 1rem;
+ font-weight: 600;
+ color: var(--text-muted);
+ margin-bottom: 0.5rem;
 }
 
 .empty-state p {
-  font-size: 0.825rem;
-  color: var(--text-dim);
+ font-size: 0.825rem;
+ color: var(--text-dim);
 }
 
 /* --------------------------------------------------------------------------
    Offcanvas Drawer (Recipe Detail)
    -------------------------------------------------------------------------- */
 #recipe_detail_drawer {
-  background: var(--surface) !important;
-  border-left: 1px solid var(--border) !important;
-  width: min(520px, 92vw) !important;
-  color: var(--text);
+ background: var(--surface) !important;
+ border-left: 1px solid var(--border) !important;
+ width: min(520px, 92vw) !important;
+ color: var(--text);
 }
 
 #recipe_detail_drawer .offcanvas-header {
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
-  padding: 1.25rem 1.5rem;
+ background: var(--surface-2);
+ border-bottom: 1px solid var(--border);
+ padding: 1.25rem 1.5rem;
 }
 
 #recipe_detail_drawer .offcanvas-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text);
+ font-size: 1.05rem;
+ font-weight: 700;
+ color: var(--text);
 }
 
 [data-bs-theme="dark"] .btn-close {
-  filter: invert(1) brightness(0.7);
+ filter: invert(1) brightness(0.7);
 }
 
 #recipe_detail_drawer .offcanvas-body {
-  padding: 1.5rem;
-  overflow-y: auto;
+ padding: 1.5rem;
+ overflow-y: auto;
 }
 
 .drawer-hero-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  margin-bottom: 1.25rem;
-  border: 1px solid var(--border);
+ width: 100%;
+ height: 180px;
+ object-fit: cover;
+ border-radius: var(--radius);
+ margin-bottom: 1.25rem;
+ border: 1px solid var(--border);
 }
 
 .drawer-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+ gap: 0.75rem;
+ margin-bottom: 1.5rem;
 }
 
 .drawer-meta-item {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.85rem;
-  text-align: center;
+ background: var(--surface-2);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-sm);
+ padding: 0.85rem;
+ text-align: center;
 }
 
 .drawer-meta-item .dm-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-dim);
-  margin-bottom: 0.35rem;
-  font-weight: 600;
+ font-size: 0.7rem;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ color: var(--text-dim);
+ margin-bottom: 0.35rem;
+ font-weight: 600;
 }
 
 .drawer-meta-item .dm-value {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--accent);
+ font-size: 1.15rem;
+ font-weight: 700;
+ color: var(--accent);
 }
 
 .drawer-section {
-  margin-bottom: 1.75rem;
+ margin-bottom: 1.75rem;
 }
 
 .drawer-section-title {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+ font-size: 0.78rem;
+ text-transform: uppercase;
+ letter-spacing: 0.6px;
+ font-weight: 700;
+ color: var(--text-muted);
+ margin-bottom: 0.75rem;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
 }
 
 .drawer-section-title i {
-  color: var(--accent);
-  font-size: 0.75rem;
+ color: var(--accent);
+ font-size: 0.75rem;
 }
 
 .ingredient-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
+ display: flex;
+ align-items: center;
+ gap: 0.6rem;
+ padding: 0.45rem 0;
+ border-bottom: 1px solid var(--border);
+ font-size: 0.875rem;
 }
 
 .ingredient-row:last-child {
-  border-bottom: none;
+ border-bottom: none;
 }
 .ingredient-row i {
-  color: var(--success);
-  font-size: 0.7rem;
-  flex-shrink: 0;
+ color: var(--success);
+ font-size: 0.7rem;
+ flex-shrink: 0;
 }
 .ingredient-row.missing i {
-  color: var(--danger);
+ color: var(--danger);
 }
 
 .step-row {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
+ display: flex;
+ gap: 0.75rem;
+ padding: 0.6rem 0;
+ border-bottom: 1px solid var(--border);
+ font-size: 0.875rem;
 }
 
 .step-row:last-child {
-  border-bottom: none;
+ border-bottom: none;
 }
 
 .step-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent-glow);
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
+ width: 24px;
+ height: 24px;
+ border-radius: 50%;
+ background: var(--accent-glow);
+ color: var(--accent);
+ font-size: 0.72rem;
+ font-weight: 700;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-shrink: 0;
+ margin-top: 1px;
 }
 
 .scale-widget {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
+ background: var(--surface-2);
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ padding: 1rem 1.25rem;
+ margin-bottom: 1.25rem;
 }
 
 .scale-widget-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
+ font-size: 0.78rem;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ color: var(--text-muted);
+ margin-bottom: 0.75rem;
 }
 
 .drawer-actions-bar {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
+ display: flex;
+ gap: 0.5rem;
+ flex-wrap: wrap;
+ margin-bottom: 1.25rem;
 }
 
 /* --------------------------------------------------------------------------
    Cooking Mode
    -------------------------------------------------------------------------- */
 .cooking-mode .cooking-wrapper {
-  min-height: calc(100vh - 4rem);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+ min-height: calc(100vh - 4rem);
+ display: flex;
+ flex-direction: column;
+ gap: 1.5rem;
 }
 
 .cooking-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+ display: flex;
+ align-items: center;
+ gap: 1rem;
+ padding-bottom: 1rem;
+ border-bottom: 1px solid var(--border);
 }
 
 .cooking-recipe-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
-  flex: 1;
+ font-size: 1.1rem;
+ font-weight: 700;
+ color: var(--text);
+ flex: 1;
 }
 
 .cooking-step-badge {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-glow);
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  white-space: nowrap;
+ font-size: 0.8rem;
+ font-weight: 600;
+ color: var(--accent);
+ background: var(--accent-glow);
+ padding: 4px 12px;
+ border-radius: 20px;
+ border: 1px solid rgba(99, 102, 241, 0.2);
+ white-space: nowrap;
 }
 
 .cooking-progress {
-  height: 6px;
-  background: var(--surface-3);
-  border-radius: 99px;
-  overflow: hidden;
+ height: 6px;
+ background: var(--surface-3);
+ border-radius: 99px;
+ overflow: hidden;
 }
 
 .cooking-progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 99px;
-  transition: width 0.4s ease;
+ height: 100%;
+ background: var(--accent);
+ border-radius: 99px;
+ transition: width 0.4s ease;
 }
 
 .cooking-step-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
+ flex: 1;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ gap: 1rem;
 }
 
 .cooking-step-number {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-dim);
+ font-size: 0.75rem;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 0.8px;
+ color: var(--text-dim);
 }
 
 .cooking-step-text {
-  font-size: 1.35rem;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.6;
+ font-size: 1.35rem;
+ font-weight: 500;
+ color: var(--text);
+ line-height: 1.6;
 }
 
 .cooking-ingredients {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+ background: var(--surface-2);
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ padding: 1rem 1.25rem;
 }
 
 .cooking-ingredients h6 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  margin-bottom: 0.6rem;
-  font-weight: 700;
+ font-size: 0.75rem;
+ text-transform: uppercase;
+ letter-spacing: 0.6px;
+ color: var(--text-muted);
+ margin-bottom: 0.6rem;
+ font-weight: 700;
 }
 
 .cooking-ing-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
+ list-style: none;
+ padding: 0;
+ margin: 0;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 0.3rem;
 }
 
 .cooking-ing-list li {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  background: var(--surface-3);
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
+ font-size: 0.8rem;
+ color: var(--text-muted);
+ background: var(--surface-3);
+ padding: 3px 9px;
+ border-radius: 20px;
+ border: 1px solid var(--border);
 }
 
 .cooking-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 1rem;
+ padding-top: 1rem;
+ border-top: 1px solid var(--border);
 }
 
 .cooking-nav-counter {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-muted);
+ font-size: 0.875rem;
+ font-weight: 600;
+ color: var(--text-muted);
 }
 
 /* --------------------------------------------------------------------------
    Live Ingredient Preview
    -------------------------------------------------------------------------- */
 .preview-ingredients-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+ display: flex;
+ flex-direction: column;
+ gap: 2px;
 }
 
 .preview-ingredient-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-sm);
-  background: var(--surface-2);
-  font-size: 0.85rem;
-  border: 1px solid var(--border);
+ display: flex;
+ align-items: baseline;
+ gap: 0.4rem;
+ padding: 0.45rem 0.75rem;
+ border-radius: var(--radius-sm);
+ background: var(--surface-2);
+ font-size: 0.85rem;
+ border: 1px solid var(--border);
 }
 
 .preview-qty {
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 30px;
+ font-weight: 700;
+ color: var(--accent);
+ min-width: 30px;
 }
 
 .preview-unit {
-  color: var(--text-muted);
-  font-style: italic;
-  min-width: 30px;
+ color: var(--text-muted);
+ font-style: italic;
+ min-width: 30px;
 }
 
 .preview-name {
-  color: var(--text);
+ color: var(--text);
 }
 
 /* --------------------------------------------------------------------------
    Inventory Stats
    -------------------------------------------------------------------------- */
 .inv-stat {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+ display: flex;
+ align-items: baseline;
+ gap: 0.5rem;
+ margin-bottom: 0.75rem;
 }
 
 .inv-stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--accent);
+ font-size: 2rem;
+ font-weight: 700;
+ color: var(--accent);
 }
 .inv-stat-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+ font-size: 0.8rem;
+ color: var(--text-muted);
 }
 
 /* --------------------------------------------------------------------------
    Settings
    -------------------------------------------------------------------------- */
 .settings-section-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
+ font-size: 0.78rem;
+ font-weight: 700;
+ text-transform: uppercase;
+ letter-spacing: 0.5px;
+ color: var(--text-muted);
+ margin-bottom: 0.75rem;
+ margin-top: 0.25rem;
 }
 
 /* --------------------------------------------------------------------------
    Shopping List
    -------------------------------------------------------------------------- */
 .shop-item {
-  display: flex;
-  align-items: center;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.875rem;
-  gap: 0.5rem;
+ display: flex;
+ align-items: center;
+ padding: 0.55rem 0;
+ border-bottom: 1px solid var(--border);
+ font-size: 0.875rem;
+ gap: 0.5rem;
 }
 
 .shop-item:last-child {
-  border-bottom: none;
+ border-bottom: none;
 }
 
 .shop-item.checked label {
-  text-decoration: line-through;
-  color: var(--text-dim);
+ text-decoration: line-through;
+ color: var(--text-dim);
 }
 
 .shop-item .checkbox {
-  margin: 0;
-  flex: 1;
+ margin: 0;
+ flex: 1;
 }
 
 /* --------------------------------------------------------------------------
    Compare Modal
    -------------------------------------------------------------------------- */
 .modal-content {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius) !important;
-  color: var(--text) !important;
+ background: var(--surface) !important;
+ border: 1px solid var(--border) !important;
+ border-radius: var(--radius) !important;
+ color: var(--text) !important;
 }
 
 .modal-header {
-  background: var(--surface-2) !important;
-  border-bottom: 1px solid var(--border) !important;
-  padding: 1.25rem 1.5rem !important;
+ background: var(--surface-2) !important;
+ border-bottom: 1px solid var(--border) !important;
+ padding: 1.25rem 1.5rem !important;
 }
 
 .modal-header .modal-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text) !important;
+ font-size: 1rem;
+ font-weight: 700;
+ color: var(--text) !important;
 }
 
 .modal-header .btn-close {
-  filter: none !important;
+ filter: none !important;
 }
 [data-bs-theme="dark"] .modal-header .btn-close {
-  filter: invert(1) brightness(0.7) !important;
+ filter: invert(1) brightness(0.7) !important;
 }
 .modal-body {
-  padding: 1.5rem !important;
+ padding: 1.5rem !important;
 }
 .modal-footer {
-  background: var(--surface-2) !important;
-  border-top: 1px solid var(--border) !important;
+ background: var(--surface-2) !important;
+ border-top: 1px solid var(--border) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -1129,251 +1130,251 @@ body {
    -------------------------------------------------------------------------- */
 .form-control,
 .form-select {
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text) !important;
-  border-radius: var(--radius-sm) !important;
-  font-size: 0.875rem !important;
+ background: var(--surface-2) !important;
+ border: 1px solid var(--border) !important;
+ color: var(--text) !important;
+ border-radius: var(--radius-sm) !important;
+ font-size: 0.875rem !important;
 }
 
 .form-control:focus,
 .form-select:focus {
-  background: var(--surface-2) !important;
-  border-color: var(--accent) !important;
-  color: var(--text) !important;
-  box-shadow: 0 0 0 3px var(--accent-glow) !important;
-  outline: none;
+ background: var(--surface-2) !important;
+ border-color: var(--accent) !important;
+ color: var(--text) !important;
+ box-shadow: 0 0 0 3px var(--accent-glow) !important;
+ outline: none;
 }
 
 .form-control::placeholder {
-  color: var(--text-dim) !important;
+ color: var(--text-dim) !important;
 }
 
 .form-label,
 label {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 0.4rem;
+ color: var(--text-muted);
+ font-size: 0.8rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.4px;
+ margin-bottom: 0.4rem;
 }
 
 textarea.form-control {
-  resize: vertical;
+ resize: vertical;
 }
 
 /* selectize.js dark theming */
 .selectize-input,
 .selectize-dropdown {
-  background: var(--surface-2) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
+ background: var(--surface-2) !important;
+ border-color: var(--border) !important;
+ color: var(--text) !important;
 }
 
 .selectize-dropdown .option:hover,
 .selectize-dropdown .active {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
+ background: var(--accent-glow) !important;
+ color: var(--accent) !important;
 }
 
 .selectize-input .item {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
-  border: 1px solid rgba(99, 102, 241, 0.25) !important;
-  border-radius: 4px !important;
+ background: var(--accent-glow) !important;
+ color: var(--accent) !important;
+ border: 1px solid rgba(99, 102, 241, 0.25) !important;
+ border-radius: 4px !important;
 }
 
 /* --------------------------------------------------------------------------
    Buttons
    -------------------------------------------------------------------------- */
 .btn {
-  border-radius: 99px !important;
-  font-weight: 600 !important;
-  font-size: 0.825rem !important;
-  transition: all 0.18s ease !important;
+ border-radius: 99px !important;
+ font-weight: 600 !important;
+ font-size: 0.825rem !important;
+ transition: all 0.18s ease !important;
 }
 
 .btn:focus {
-  box-shadow: 0 0 0 3px var(--accent-glow) !important;
+ box-shadow: 0 0 0 3px var(--accent-glow) !important;
 }
 
 .btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    color-mix(in srgb, var(--accent) 62%, #a855f7)
-  ) !important;
-  border-color: transparent !important;
-  color: #fff !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+ background: linear-gradient(
+  135deg,
+  var(--accent),
+  color-mix(in srgb, var(--accent) 62%, #a855f7)
+ ) !important;
+ border-color: transparent !important;
+ color: #fff !important;
+ box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 6px 18px rgba(99, 102, 241, 0.4) !important;
-  transform: translateY(-1px);
+ filter: brightness(1.08);
+ box-shadow:
+  inset 0 1px 0 rgba(255, 255, 255, 0.25),
+  0 6px 18px rgba(99, 102, 241, 0.4) !important;
+ transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: var(--surface-3) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
+ background: var(--surface-3) !important;
+ border-color: var(--border) !important;
+ color: var(--text) !important;
 }
 
 .btn-secondary:hover {
-  background: var(--border-light) !important;
-  color: var(--text) !important;
+ background: var(--border-light) !important;
+ color: var(--text) !important;
 }
 
 .btn-success {
-  background: var(--success) !important;
-  border-color: var(--success) !important;
-  color: #fff !important;
+ background: var(--success) !important;
+ border-color: var(--success) !important;
+ color: #fff !important;
 }
 .btn-danger {
-  background: var(--danger) !important;
-  border-color: var(--danger) !important;
-  color: #fff !important;
+ background: var(--danger) !important;
+ border-color: var(--danger) !important;
+ color: #fff !important;
 }
 .btn-warning {
-  background: var(--warning) !important;
-  border-color: var(--warning) !important;
-  color: #000 !important;
+ background: var(--warning) !important;
+ border-color: var(--warning) !important;
+ color: #000 !important;
 }
 .btn-info {
-  background: var(--info) !important;
-  border-color: var(--info) !important;
-  color: #000 !important;
+ background: var(--info) !important;
+ border-color: var(--info) !important;
+ color: #000 !important;
 }
 
 .btn-outline-primary {
-  background: transparent !important;
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
+ background: transparent !important;
+ border-color: var(--accent) !important;
+ color: var(--accent) !important;
 }
 .btn-outline-primary:hover {
-  background: var(--accent-glow) !important;
+ background: var(--accent-glow) !important;
 }
 .btn-outline-danger {
-  background: transparent !important;
-  border-color: var(--danger) !important;
-  color: var(--danger) !important;
+ background: transparent !important;
+ border-color: var(--danger) !important;
+ color: var(--danger) !important;
 }
 .btn-outline-danger:hover {
-  background: rgba(239, 68, 68, 0.1) !important;
+ background: rgba(239, 68, 68, 0.1) !important;
 }
 .btn-outline-secondary {
-  background: transparent !important;
-  border-color: var(--border) !important;
-  color: var(--text-muted) !important;
+ background: transparent !important;
+ border-color: var(--border) !important;
+ color: var(--text-muted) !important;
 }
 .btn-outline-secondary:hover {
-  background: var(--surface-2) !important;
-  color: var(--text) !important;
+ background: var(--surface-2) !important;
+ color: var(--text) !important;
 }
 
 /* --------------------------------------------------------------------------
    DT DataTable
    -------------------------------------------------------------------------- */
 .dataTables_wrapper {
-  color: var(--text) !important;
+ color: var(--text) !important;
 }
 
 .dataTables_wrapper .dataTable {
-  color: var(--text) !important;
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
+ color: var(--text) !important;
+ border-collapse: separate !important;
+ border-spacing: 0 !important;
 }
 
 .dataTables_wrapper .dataTable thead th {
-  background: var(--surface-2) !important;
-  color: var(--text-muted) !important;
-  border-bottom: 1px solid var(--border) !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  padding: 0.75rem 1rem !important;
+ background: var(--surface-2) !important;
+ color: var(--text-muted) !important;
+ border-bottom: 1px solid var(--border) !important;
+ font-size: 0.75rem !important;
+ font-weight: 700 !important;
+ text-transform: uppercase !important;
+ letter-spacing: 0.5px !important;
+ padding: 0.75rem 1rem !important;
 }
 
 .dataTables_wrapper .dataTable tbody tr {
-  background: var(--surface) !important;
+ background: var(--surface) !important;
 }
 .dataTables_wrapper .dataTable tbody tr:hover {
-  background: var(--surface-2) !important;
+ background: var(--surface-2) !important;
 }
 
 .dataTables_wrapper .dataTable tbody td {
-  border-bottom: 1px solid var(--border) !important;
-  padding: 0.65rem 1rem !important;
-  font-size: 0.85rem !important;
-  color: var(--text) !important;
+ border-bottom: 1px solid var(--border) !important;
+ padding: 0.65rem 1rem !important;
+ font-size: 0.85rem !important;
+ color: var(--text) !important;
 }
 
 .dataTables_wrapper .dataTable tbody tr.selected td {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
+ background: var(--accent-glow) !important;
+ color: var(--accent) !important;
 }
 
 .dataTables_length select,
 .dataTables_filter input {
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text) !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 0.2rem 0.5rem !important;
+ background: var(--surface-2) !important;
+ border: 1px solid var(--border) !important;
+ color: var(--text) !important;
+ border-radius: var(--radius-sm) !important;
+ padding: 0.2rem 0.5rem !important;
 }
 
 .dataTables_length label,
 .dataTables_filter label,
 .dataTables_info,
 .dataTables_paginate .paginate_button {
-  color: var(--text-muted) !important;
-  font-size: 0.8rem !important;
+ color: var(--text-muted) !important;
+ font-size: 0.8rem !important;
 }
 
 .dataTables_paginate .paginate_button.current,
 .dataTables_paginate .paginate_button.current:hover {
-  background: var(--accent) !important;
-  color: #fff !important;
-  border: 1px solid var(--accent) !important;
-  border-radius: var(--radius-sm) !important;
+ background: var(--accent) !important;
+ color: #fff !important;
+ border: 1px solid var(--accent) !important;
+ border-radius: var(--radius-sm) !important;
 }
 
 .dataTables_paginate .paginate_button:hover {
-  background: var(--surface-2) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
+ background: var(--surface-2) !important;
+ color: var(--text) !important;
+ border: 1px solid var(--border) !important;
 }
 
 /* --------------------------------------------------------------------------
    shinyWidgets PickerInput
    -------------------------------------------------------------------------- */
 .bootstrap-select .dropdown-toggle {
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text) !important;
-  border-radius: var(--radius-sm) !important;
+ background: var(--surface-2) !important;
+ border: 1px solid var(--border) !important;
+ color: var(--text) !important;
+ border-radius: var(--radius-sm) !important;
 }
 
 .bootstrap-select .dropdown-menu {
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm) !important;
+ background: var(--surface-2) !important;
+ border: 1px solid var(--border) !important;
+ border-radius: var(--radius-sm) !important;
 }
 
 .bootstrap-select .dropdown-item {
-  color: var(--text) !important;
-  font-size: 0.85rem !important;
+ color: var(--text) !important;
+ font-size: 0.85rem !important;
 }
 
 .bootstrap-select .dropdown-item:hover,
 .bootstrap-select .dropdown-item.active {
-  background: var(--accent-glow) !important;
-  color: var(--accent) !important;
+ background: var(--accent-glow) !important;
+ color: var(--accent) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -1381,241 +1382,238 @@ textarea.form-control {
    -------------------------------------------------------------------------- */
 .radio label,
 .checkbox label {
-  color: var(--text) !important;
-  font-size: 0.875rem !important;
-  font-weight: 400 !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
+ color: var(--text) !important;
+ font-size: 0.875rem !important;
+ font-weight: 400 !important;
+ text-transform: none !important;
+ letter-spacing: 0 !important;
 }
 
 /* --------------------------------------------------------------------------
    Shiny Notifications
    -------------------------------------------------------------------------- */
 .shiny-notification {
-  background: var(--surface-2) !important;
-  border: 1px solid var(--border) !important;
-  border-left: 4px solid var(--accent) !important;
-  color: var(--text) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: var(--shadow-lg) !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  min-width: 280px !important;
+ background: var(--surface-2) !important;
+ border: 1px solid var(--border) !important;
+ border-left: 4px solid var(--accent) !important;
+ color: var(--text) !important;
+ border-radius: var(--radius) !important;
+ box-shadow: var(--shadow-lg) !important;
+ font-size: 0.875rem !important;
+ font-weight: 500 !important;
+ min-width: 280px !important;
 }
 
 .shiny-notification.shiny-notification-message {
-  border-left-color: var(--success) !important;
+ border-left-color: var(--success) !important;
 }
 .shiny-notification.shiny-notification-error {
-  border-left-color: var(--danger) !important;
+ border-left-color: var(--danger) !important;
 }
 .shiny-notification.shiny-notification-warning {
-  border-left-color: var(--warning) !important;
+ border-left-color: var(--warning) !important;
 }
 .shiny-notification-close {
-  color: var(--text-dim) !important;
-  filter: none !important;
+ color: var(--text-dim) !important;
+ filter: none !important;
 }
 
 /* --------------------------------------------------------------------------
    bslib Accordion
    -------------------------------------------------------------------------- */
 .accordion-item {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
+ background: var(--surface) !important;
+ border-color: var(--border) !important;
 }
 
 .accordion-button {
-  background: var(--surface-2) !important;
-  color: var(--text) !important;
-  font-weight: 600 !important;
-  font-size: 0.875rem !important;
+ background: var(--surface-2) !important;
+ color: var(--text) !important;
+ font-weight: 600 !important;
+ font-size: 0.875rem !important;
 }
 
 .accordion-button:not(.collapsed) {
-  background: var(--accent-glow2) !important;
-  color: var(--accent) !important;
-  box-shadow: none !important;
+ background: var(--accent-glow2) !important;
+ color: var(--accent) !important;
+ box-shadow: none !important;
 }
 
 .accordion-button::after {
-  filter: invert(0.6);
+ filter: invert(0.6);
 }
 .accordion-body {
-  background: var(--surface) !important;
-  color: var(--text) !important;
+ background: var(--surface) !important;
+ color: var(--text) !important;
 }
 
 /* --------------------------------------------------------------------------
    bslib value_box — tinted glass, compact showcase
    -------------------------------------------------------------------------- */
 .bslib-value-box {
-  border-radius: var(--glass-radius) !important;
-  border: 1px solid var(--glass-border) !important;
-  overflow: hidden;
+ border-radius: var(--glass-radius) !important;
+ border: 1px solid var(--glass-border) !important;
+ overflow: hidden;
 }
 
 .bslib-value-box .value-box-showcase i {
-  font-size: 1.6rem !important;
+ font-size: 1.6rem !important;
 }
 
 .bslib-value-box .value-box-grid {
-  ---bslib-value-box-showcase-max-h: 56px !important;
+ ---bslib-value-box-showcase-max-h: 56px !important;
 }
 
 .bslib-value-box.bg-primary {
-  background:
-    linear-gradient(135deg, rgba(99, 102, 241, 0.38), rgba(168, 85, 247, 0.16)),
-    var(--glass-bg-content) !important;
+ background:
+  linear-gradient(135deg, rgba(99, 102, 241, 0.38), rgba(168, 85, 247, 0.16)),
+  var(--glass-bg-content) !important;
 }
 
 .bslib-value-box.bg-primary .value-box-showcase i {
-  color: #c7d2fe;
+ color: #c7d2fe;
 }
 
 .bslib-value-box.bg-info {
-  background:
-    linear-gradient(135deg, rgba(14, 165, 233, 0.34), rgba(99, 102, 241, 0.12)),
-    var(--glass-bg-content) !important;
+ background:
+  linear-gradient(135deg, rgba(14, 165, 233, 0.34), rgba(99, 102, 241, 0.12)),
+  var(--glass-bg-content) !important;
 }
 
 .bslib-value-box.bg-info .value-box-showcase i {
-  color: #bae6fd;
+ color: #bae6fd;
 }
 
 .bslib-value-box.bg-success {
-  background:
-    linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(14, 165, 233, 0.1)),
-    var(--glass-bg-content) !important;
+ background:
+  linear-gradient(135deg, rgba(16, 185, 129, 0.32), rgba(14, 165, 233, 0.1)),
+  var(--glass-bg-content) !important;
 }
 
 .bslib-value-box.bg-success .value-box-showcase i {
-  color: #a7f3d0;
+ color: #a7f3d0;
 }
 
 .bslib-value-box.bg-warning {
-  background:
-    linear-gradient(135deg, rgba(245, 158, 11, 0.34), rgba(239, 68, 68, 0.12)),
-    var(--glass-bg-content) !important;
+ background:
+  linear-gradient(135deg, rgba(245, 158, 11, 0.34), rgba(239, 68, 68, 0.12)),
+  var(--glass-bg-content) !important;
 }
 
 .bslib-value-box.bg-warning .value-box-showcase i {
-  color: #fde68a;
+ color: #fde68a;
 }
 
 /* --------------------------------------------------------------------------
    bslib card tweaks
    -------------------------------------------------------------------------- */
 .card {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-  border-radius: var(--radius) !important;
+ background: var(--surface) !important;
+ border-color: var(--border) !important;
+ border-radius: var(--radius) !important;
 }
 
 .card-header {
-  background: var(--surface-2) !important;
-  border-bottom-color: var(--border) !important;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--text) !important;
+ background: var(--surface-2) !important;
+ border-bottom-color: var(--border) !important;
+ font-weight: 600;
+ font-size: 0.875rem;
+ color: var(--text) !important;
 }
 
 .card-body {
-  color: var(--text) !important;
+ color: var(--text) !important;
 }
 
 /* --------------------------------------------------------------------------
    Utility
    -------------------------------------------------------------------------- */
 .text-accent {
-  color: var(--accent) !important;
+ color: var(--accent) !important;
 }
 .text-success {
-  color: var(--success) !important;
+ color: var(--success) !important;
 }
 .text-danger {
-  color: var(--danger) !important;
+ color: var(--danger) !important;
 }
 .text-warning {
-  color: var(--warning) !important;
+ color: var(--warning) !important;
 }
 .bg-surface {
-  background: var(--surface) !important;
+ background: var(--surface) !important;
 }
 .divider {
-  height: 1px;
-  background: var(--border);
-  margin: 1.25rem 0;
-}
-.settings-section-label {
-  margin-top: 0.25rem;
+ height: 1px;
+ background: var(--border);
+ margin: 1.25rem 0;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+ width: 6px;
+ height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+ background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-3);
-  border-radius: 99px;
+ background: var(--surface-3);
+ border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-light);
+ background: var(--border-light);
 }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--accent-glow);
+ outline: 2px solid var(--accent);
+ outline-offset: 2px;
+ box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
 /* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .content-pane {
-    padding: 1.25rem 1rem;
-  }
+ .content-pane {
+  padding: 1.25rem 1rem;
+ }
 
-  .recipe-cards-grid {
-    grid-template-columns: 1fr;
-  }
+ .recipe-cards-grid {
+  grid-template-columns: 1fr;
+ }
 
-  .browse-stats-bar {
-    gap: 0.75rem;
-  }
+ .browse-stats-bar {
+  gap: 0.75rem;
+ }
 
-  .cooking-step-text {
-    font-size: 1.1rem;
-  }
+ .cooking-step-text {
+  font-size: 1.1rem;
+ }
 }
 
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+ *,
+ *::before,
+ *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+ }
 }
 
 /* Visually hidden but available to screen readers (used for input labels) */
 .visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+ position: absolute !important;
+ width: 1px !important;
+ height: 1px !important;
+ padding: 0 !important;
+ margin: -1px !important;
+ overflow: hidden !important;
+ clip: rect(0, 0, 0, 0) !important;
+ white-space: nowrap !important;
+ border: 0 !important;
 }
