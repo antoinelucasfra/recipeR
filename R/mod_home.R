@@ -44,7 +44,11 @@ mod_home_ui <- function(id) {
 
     bslib::layout_columns(
       col_widths = c(3, 3, 3, 3),
-      bslib::card(
+      tags$div(
+        class = "feature-card",
+        `data-goto` = "browse",
+        role = "button",
+        tabindex = 0,
         bslib::card_body(
           tags$div(
             class = "feature-card-icon",
@@ -56,7 +60,11 @@ mod_home_ui <- function(id) {
           )
         )
       ),
-      bslib::card(
+      tags$div(
+        class = "feature-card",
+        `data-goto` = "add",
+        role = "button",
+        tabindex = 0,
         bslib::card_body(
           tags$div(class = "feature-card-icon", tags$i(class = "fas fa-plus")),
           tags$h5("Add Recipes"),
@@ -65,7 +73,11 @@ mod_home_ui <- function(id) {
           )
         )
       ),
-      bslib::card(
+      tags$div(
+        class = "feature-card",
+        `data-goto` = "browse",
+        role = "button",
+        tabindex = 0,
         bslib::card_body(
           tags$div(
             class = "feature-card-icon",
@@ -77,7 +89,11 @@ mod_home_ui <- function(id) {
           )
         )
       ),
-      bslib::card(
+      tags$div(
+        class = "feature-card",
+        `data-goto` = "settings",
+        role = "button",
+        tabindex = 0,
         bslib::card_body(
           tags$div(class = "feature-card-icon", tags$i(class = "fas fa-gear")),
           tags$h5("Settings"),
@@ -98,7 +114,9 @@ mod_home_server <- function(id, rv) {
     })
 
     output$stat_cuisines <- renderText({
-      if (length(rv$recipes) == 0) return("0")
+      if (length(rv$recipes) == 0) {
+        return("0")
+      }
       length(unique(sapply(rv$recipes, function(r) r$source)))
     })
 
@@ -107,7 +125,9 @@ mod_home_server <- function(id, rv) {
     })
 
     output$stat_avg_ingredients <- renderText({
-      if (length(rv$recipes) == 0) return("0")
+      if (length(rv$recipes) == 0) {
+        return("0")
+      }
       round(mean(sapply(rv$recipes, function(r) length(r$ingredients))), 1)
     })
   })

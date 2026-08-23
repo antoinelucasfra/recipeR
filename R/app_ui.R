@@ -61,6 +61,15 @@ app_head_tags <- function() {
             });
           });
 
+          // Home feature cards navigate to their pane
+          document.querySelectorAll('[data-goto]').forEach(function(el) {
+            var go = function() { activatePane(el.getAttribute('data-goto')); };
+            el.addEventListener('click', go);
+            el.addEventListener('keydown', function(e) {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+            });
+          });
+
           // '/' focuses search input from anywhere
           document.addEventListener('keydown', function(e) {
             var tag = document.activeElement.tagName;
